@@ -46,6 +46,8 @@ a.btn,a.btn:hover{color:var(--on-c)}
 .brand .mk{width:32px;height:32px;border:1px solid var(--c);display:flex;align-items:center;justify-content:center;font-family:var(--cond);font-weight:600;font-size:15px;color:var(--c)}
 .brand .nm{font-family:var(--cond);font-weight:600;font-size:18px;letter-spacing:.32em}
 .brand img{max-height:36px;max-width:200px}
+.brand .ico{height:36px;width:36px;object-fit:contain}
+.brand.both .ico{display:none}
 .nav{display:flex;align-items:center;gap:40px;font-family:var(--cond);font-weight:500;font-size:14px;letter-spacing:.24em}
 .nav a[aria-current]{color:var(--c);text-shadow:0 0 12px rgba(var(--c-rgb),.6)}
 .nav .btn{height:44px;padding:0 20px;font-size:14px}
@@ -172,6 +174,8 @@ a.btn,a.btn:hover{color:var(--on-c)}
   :root{--pad:20px}
   .nav .nl{display:none}
   .brand .nm{font-size:15px;letter-spacing:.24em;white-space:nowrap}
+  .brand.both .ico{display:block}
+  .brand.both .full{display:none}
   .nav .btn{height:40px;padding:0 14px;font-size:12px}
   .top .wrap{height:64px}
   .doors{grid-template-columns:1fr;gap:16px;padding:20px 0 48px}
@@ -303,6 +307,15 @@ a.btn,a.btn:hover{color:var(--on-c)}
     var x = m[1].length === 3 ? m[1].replace(/./g, '$&$&') : m[1];
     return [parseInt(x.slice(0, 2), 16), parseInt(x.slice(2, 4), 16), parseInt(x.slice(4, 6), 16)];
   }
+  // Isotipo: ícono de la pestaña y de la pantalla de inicio del celular
+  function setIcon(url) {
+    [['icon', 'favicon'], ['apple-touch-icon', 'appleIcon']].forEach(function (r) {
+      var l = document.getElementById(r[1]);
+      if (!l) { l = document.createElement('link'); l.id = r[1]; l.rel = r[0]; document.head.appendChild(l); }
+      if (l.href !== url) l.href = url;
+    });
+    var old = document.querySelector('link[rel="icon"]:not(#favicon)'); if (old) old.remove();
+  }
   function applySite(s) {
     if (!s || !s.MARCA) return;
     SITE = s;
@@ -310,8 +323,11 @@ a.btn,a.btn:hover{color:var(--on-c)}
     if (ac && s.COLOR_ACENTO.toLowerCase() !== '#ffffff') { root.setProperty('--c', s.COLOR_ACENTO); root.setProperty('--c-rgb', ac.join(',')); }
     if (bg && s.COLOR_FONDO.toLowerCase() !== '#000000') root.setProperty('--bg', s.COLOR_FONDO);
     document.title = s.NOMBRE_VISIBLE || s.MARCA;
-    if (s.LOGO_URL) $('brand').innerHTML = '<img src="' + esc(s.LOGO_URL) + '" alt="' + esc(s.MARCA) + '">';
-    else if ($('brandName')) $('brandName').textContent = s.MARCA;
+    var ico = s.ICON_URL ? '<img class="ico" src="' + esc(s.ICON_URL) + '" alt="' + esc(s.MARCA) + '">' : '';
+    if (s.LOGO_URL) $('brand').innerHTML = '<img class="full" src="' + esc(s.LOGO_URL) + '" alt="' + esc(s.MARCA) + '">' + ico;
+    else $('brand').innerHTML = (ico || '<span class="mk">T</span>') + '<span class="nm">' + esc(s.MARCA) + '</span>';
+    $('brand').classList.toggle('both', !!(s.LOGO_URL && s.ICON_URL));
+    if (s.ICON_URL) setIcon(s.ICON_URL);
     $('footBrand').textContent = '© ' + s.MARCA;
     if (s.ANALYTICS_ID && !window.gtag && /^G-[A-Z0-9]+$/i.test(s.ANALYTICS_ID)) {
       var g = document.createElement('script');
@@ -353,7 +369,7 @@ a.btn,a.btn:hover{color:var(--on-c)}
       return '<img loading="lazy" src="' + img(l.id, 600) + '" alt="' + esc(l.n) + '" title="' + esc(l.n) + '">';
     }).join('');
     view.innerHTML =
-      (logos ? '<section class="logos" aria-label="Campeonatos que cubrimos"><div class="wrap"><span class="lab">CUBRIMOS</span><div class="row">' + logos + '</div></div></section>' : '') +
+      (logos ? '<section class="logos" aria-label="Campeonatos que cubrimos"><div class="wrap"><div class="row">' + logos + '</div></div></section>' : '') +
       '<div class="wrap"><section class="doors" aria-label="Apartados">' +
         door('01', 'eventos/', 'EVENTOS', 'Comprá tus fotos de cada fecha.', ev && ev.cover ? img(ev.cover, 900) : '') +
         door('02', '#/galeria', 'GALERÍA', 'Nuestras mejores fotos de carreras.', ph ? img(ph.id, 900) : '') +

@@ -412,6 +412,14 @@ a.btn.ghost,a.btn.ghost:hover{color:#fff}
     $('footLink').href = home;
     $('footLink').textContent = s.WEB_PRINCIPAL ? s.WEB_PRINCIPAL.replace(/^https?:\/\//, '').replace(/\/$/, '').toUpperCase() : '';
     setWatermark(s.MARCA_DE_AGUA || s.MARCA);
+    if (s.ICON_URL) {
+      [['icon', 'favicon'], ['apple-touch-icon', 'appleIcon']].forEach(function (r) {
+        var l = document.getElementById(r[1]);
+        if (!l) { l = document.createElement('link'); l.id = r[1]; l.rel = r[0]; document.head.appendChild(l); }
+        l.href = s.ICON_URL;
+      });
+      var old = document.querySelector('link[rel="icon"]:not(#favicon)'); if (old) old.remove();
+    }
     if (s.ANALYTICS_ID && !window.gtag && /^G-[A-Z0-9]+$/i.test(s.ANALYTICS_ID)) {
       var g = document.createElement('script');
       g.async = true; g.src = 'https://www.googletagmanager.com/gtag/js?id=' + s.ANALYTICS_ID;
