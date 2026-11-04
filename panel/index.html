@@ -53,6 +53,9 @@ button,input,textarea,select{font-family:inherit;color:inherit}
 .brand .nm{font-family:var(--cond);font-style:italic;font-weight:700;font-size:28px}
 .brand .nm em{font-style:inherit;color:var(--c);text-shadow:0 0 14px rgba(var(--c-rgb),.7)}
 .brand .tag{padding:3px 8px;border:1px solid var(--c);font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--c)}
+.tright{display:flex;align-items:center;gap:22px}
+.home{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 14px;box-shadow:inset 0 0 0 1px rgba(var(--c-rgb),.35);font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--muted);transition:color .2s,box-shadow .2s;white-space:nowrap}
+.home:hover{color:var(--c);box-shadow:inset 0 0 0 1px var(--c),0 0 12px rgba(var(--c-rgb),.35)}
 .tabs{display:flex;align-items:center;gap:34px;font-family:var(--cond);font-weight:500;font-size:15px;letter-spacing:.22em}
 .tabs a{position:relative;padding:8px 0}
 .tabs a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:var(--c);box-shadow:0 0 8px var(--c);transition:right .3s}
@@ -167,6 +170,10 @@ legend{padding:0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.16em
 @media (max-width:700px){
   .wrap{padding:0 20px}
   .tabs{display:none}
+  .tright{gap:8px}.home{padding:0 10px}
+  .brand .tag{display:none}
+  #newBtn{padding:0 16px;font-size:20px;letter-spacing:0}#newBtn .nb{display:none}
+  .mobtabs a{min-width:0;padding-left:4px!important;padding-right:4px!important;font-size:11px!important;letter-spacing:.08em!important;text-align:center;justify-content:center}
   .top .wrap{height:64px}
   .h1{font-size:40px}
   .g2{grid-template-columns:1fr}
@@ -188,10 +195,12 @@ legend{padding:0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.16em
     <nav class="tabs" id="tabs" aria-label="Panel" hidden>
       <a href="#/" data-t="resumen">RESUMEN</a>
       <a href="#/presupuestos" data-t="presupuestos">PRESUPUESTOS</a>
-      <a href="../" target="_blank" rel="noopener">VER WEB</a>
       <a href="#/salir">SALIR</a>
     </nav>
-    <a class="btn cut" id="newBtn" href="#/nuevo" hidden>+ NUEVO PRESUPUESTO</a>
+    <div class="tright">
+      <a class="home" href="../"><span aria-hidden="true">←</span> HOME</a>
+      <a class="btn cut" id="newBtn" href="#/nuevo" hidden title="Nuevo presupuesto">+<span class="nb"> NUEVO PRESUPUESTO</span></a>
+    </div>
   </div>
 </header>
 
@@ -331,8 +340,17 @@ legend{padding:0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.16em
     });
   }
   function alertBox(t) { var p = document.createElement('p'); p.className = 'err'; p.textContent = t; view.querySelector('.wrap').prepend(p); }
+  function refList(v) {
+    return String(v || '').split('\n').map(function (l) {
+      l = l.trim(); var m = l.match(/https?:\/\/\S+/i); if (!m) return null;
+      var u = m[0].replace(/[),.;]+$/, '');
+      return [l.replace(m[0], '').replace(/^[\s|:\-–—]+|[\s|:\-–—]+$/g, '').trim(), u];
+    }).filter(Boolean).slice(0, 12);
+  }
   function waLink(q) {
     var t = 'Hola! Te paso el presupuesto de ' + (SITE.NOMBRE_VISIBLE || 'Tapir Media') + ' para ' + (q.evento || 'el evento') + ': ' + q.pdf;
+    var r = refList(q.refs);
+    if (r.length) t += '\n\nReferencias de nuestro trabajo:\n' + r.map(function (x) { return (x[0] ? x[0] + ': ' : '') + x[1]; }).join('\n');
     return 'https://wa.me/?text=' + encodeURIComponent(t);
   }
 
@@ -341,7 +359,7 @@ legend{padding:0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.16em
   function lastAuthor() { try { return localStorage.getItem('tm_redacta') || ''; } catch (x) { return ''; } }
   function blank() {
     return { id: '', n: 0, cliente: '', dirigido: '', redacta: lastAuthor(), evento: '', fecha: '', lugar: '', idea: '', texto: '', precio: '', validez: 15,
-      pago: 'Seña 50% + saldo al entregar · Transferencia', pdf: '', estado: 'borrador', creado: '',
+      pago: 'Seña 50% + saldo al entregar · Transferencia', pdf: '', estado: 'borrador', creado: '', refs: '',
       items: { foto: { on: true, n: 2 }, film: { on: true, n: 1 }, crudo: { on: false }, editado: { on: true, tipo: '' }, entrega: { on: true, fecha: '' } } };
   }
   var ITEMS = [
@@ -405,6 +423,10 @@ legend{padding:0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.16em
           '<div class="lbl" style="grid-column:1/-1"><span class="k">FORMA DE PAGO (PODÉS ELEGIR VARIAS)</span><div class="chips">' + PAYS.map(function (p) {
             return '<button class="chip cutsm" type="button" data-pay="' + esc(p) + '" aria-pressed="' + payOn(p) + '">' + esc(p) + '</button>';
           }).join('') + '</div><input class="fld" data-f="pagoExtra" value="' + esc(extra) + '" placeholder="Otra condición (opcional). Ej: 3 cuotas sin interés"></div>' +
+        '</fieldset>' +
+        '<fieldset style="display:flex;flex-direction:column;gap:10px"><legend>05 · REFERENCIAS (LINKS)</legend>' +
+          '<label class="lbl"><span class="k">UN LINK POR RENGLÓN · PODÉS PONERLE NOMBRE ANTES DE UNA |</span><textarea class="fld" rows="4" data-f="refs" placeholder="Reel Rally de Córdoba 2025 | https://www.instagram.com/reel/...&#10;Galería de fotos | https://drive.google.com/...&#10;https://youtu.be/...">' + esc(e.refs || '') + '</textarea></label>' +
+          '<span style="font-size:13px;line-height:1.5;color:var(--muted)">Salen en el PDF como links que se pueden tocar, y en el mensaje de WhatsApp.</span>' +
         '</fieldset></form>' +
         '<aside class="prev" aria-label="Vista previa"><span class="kc">VISTA PREVIA DEL PDF</span><div class="paper" id="paper"></div>' +
           '<button class="btn cut" type="button" id="pdfBtn" style="height:54px">' + (e.pdf ? 'ACTUALIZAR PDF' : 'GENERAR PDF') + '</button>' +
@@ -455,7 +477,7 @@ legend{padding:0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.16em
       b.disabled = true; b.innerHTML = '<span class="spin"></span>&nbsp; ' + (final ? 'GENERANDO PDF…' : 'GUARDANDO…');
       try { if (e.redacta) localStorage.setItem('tm_redacta', e.redacta); } catch (x) {}
       call({ action: 'panel_guardar', id: e.id, cliente: e.cliente, dirigido: e.dirigido, redacta: e.redacta, evento: e.evento, fecha: e.fecha, lugar: e.lugar,
-        idea: e.idea, texto: e.texto, items: e.items, precio: e.precio, validez: e.validez, pago: e.pago, final: final }).then(function (d) {
+        idea: e.idea, texto: e.texto, items: e.items, refs: e.refs, precio: e.precio, validez: e.validez, pago: e.pago, final: final }).then(function (d) {
         ED = d.quote; SUMMARY = null;
         if (QUOTES) { var i = -1; QUOTES.forEach(function (q, k) { if (q.id === d.quote.id) i = k; }); if (i >= 0) QUOTES[i] = d.quote; else QUOTES.unshift(d.quote); }
         if (location.hash !== '#/p/' + d.quote.id) history.replaceState(null, '', '#/p/' + d.quote.id);
@@ -490,6 +512,8 @@ legend{padding:0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.16em
       '<div class="body">' + (html || '<p style="color:var(--muted)">El texto del presupuesto aparece acá.</p>') +
         (itemLines(e.items).length ? '<p style="font-family:var(--mono);font-size:7px;letter-spacing:.14em;color:var(--c);margin-top:8px">DETALLE</p>' +
           itemLines(e.items).map(function (x) { return '<div style="display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid rgba(var(--c-rgb),.15);padding:2px 0"><span style="font-family:var(--mono);font-size:6.5px;color:var(--muted)">' + esc(x[0]).toUpperCase() + '</span><span>' + esc(x[1]) + '</span></div>'; }).join('') : '') +
+      (refList(e.refs).length ? '<p style="font-family:var(--mono);font-size:7px;letter-spacing:.14em;color:var(--c);margin-top:8px">REFERENCIAS</p>' +
+        refList(e.refs).map(function (x) { return '<div style="color:var(--c);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(x[0] || x[1].replace(/^https?:\/\//, '')) + '</div>'; }).join('') : '') +
       '</div>' +
       '<div class="tot"><span class="k" style="font-size:7px">TOTAL</span><b>' + money(e.precio) + '</b></div>' +
       '<span class="cond">Forma de pago: ' + esc(e.pago || 'a convenir') + (e.redacta ? '<br>Redactó: ' + esc(e.redacta) : '') + '</span>' +
