@@ -50,8 +50,17 @@ a.btn,a.btn:hover{color:var(--on-c)}
 .nav a[aria-current]{color:var(--c);text-shadow:0 0 12px rgba(var(--c-rgb),.6)}
 .nav .btn{height:44px;padding:0 20px;font-size:14px}
 
+/* Logos de campeonatos */
+.logos{border-bottom:1px solid var(--line)}
+.logos .wrap{display:flex;align-items:center;gap:20px 56px;padding-top:28px;padding-bottom:28px;overflow-x:auto;scrollbar-width:none}
+.logos .wrap::-webkit-scrollbar{display:none}
+.logos .lab{flex:none;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted)}
+.logos .row{flex:1;display:flex;align-items:center;justify-content:space-between;gap:48px;min-width:max-content}
+.logos img{flex:none;height:52px;width:auto;max-width:170px;object-fit:contain;opacity:.9;transition:opacity .2s}
+.logos img:hover{opacity:1}
+
 /* Portada */
-.doors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;padding:64px 0 96px}
+.doors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;padding:48px 0 96px}
 .door{position:relative;height:480px;display:flex;flex-direction:column;justify-content:flex-end;gap:12px;padding:32px;color:var(--text);overflow:hidden;box-shadow:0 0 0 1px rgba(var(--c-rgb),.45),0 0 24px rgba(var(--c-rgb),.12);transition:box-shadow .2s}
 .door:hover{color:var(--text);box-shadow:0 0 0 1px var(--c),0 0 30px rgba(var(--c-rgb),.6),0 0 80px rgba(var(--c-rgb),.25)}
 .door .bgimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s}
@@ -169,6 +178,10 @@ a.btn,a.btn:hover{color:var(--on-c)}
   .door{height:200px;padding:20px}
   .door .num{top:16px;left:20px;right:20px}
   .door .lbl{font-size:40px}
+  .logos .wrap{gap:24px;padding-top:20px;padding-bottom:20px}
+  .logos .row{gap:28px;justify-content:flex-start}
+  .logos img{height:36px;max-width:120px}
+  .logos .lab{display:none}
   .bio .wrap,.contact .wrap{grid-template-columns:1fr;padding-top:56px;padding-bottom:56px}
   .bio .txt,.team,.contact .l,.contact .r{grid-column:1 / -1}
   .team{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
@@ -298,7 +311,7 @@ a.btn,a.btn:hover{color:var(--on-c)}
     if (bg && s.COLOR_FONDO.toLowerCase() !== '#000000') root.setProperty('--bg', s.COLOR_FONDO);
     document.title = s.NOMBRE_VISIBLE || s.MARCA;
     if (s.LOGO_URL) $('brand').innerHTML = '<img src="' + esc(s.LOGO_URL) + '" alt="' + esc(s.MARCA) + '">';
-    else $('brandName').textContent = s.MARCA;
+    else if ($('brandName')) $('brandName').textContent = s.MARCA;
     $('footBrand').textContent = '© ' + s.MARCA;
     if (s.ANALYTICS_ID && !window.gtag && /^G-[A-Z0-9]+$/i.test(s.ANALYTICS_ID)) {
       var g = document.createElement('script');
@@ -336,7 +349,11 @@ a.btn,a.btn:hover{color:var(--on-c)}
       return k > 0 ? { t: x.slice(0, k).trim(), x: x.slice(k + 1).trim() } : { t: '', x: x };
     });
     var num = wa(), ig = String(SITE.INSTAGRAM || '').replace(/^@/, '');
+    var logos = (G.logos || []).map(function (l, k) {
+      return '<img loading="lazy" src="' + img(l.id, 600) + '" alt="' + esc(l.n) + '" title="' + esc(l.n) + '">';
+    }).join('');
     view.innerHTML =
+      (logos ? '<section class="logos" aria-label="Campeonatos que cubrimos"><div class="wrap"><span class="lab">CUBRIMOS</span><div class="row">' + logos + '</div></div></section>' : '') +
       '<div class="wrap"><section class="doors" aria-label="Apartados">' +
         door('01', 'eventos/', 'EVENTOS', 'Comprá tus fotos de cada fecha.', ev && ev.cover ? img(ev.cover, 900) : '') +
         door('02', '#/galeria', 'GALERÍA', 'Nuestras mejores fotos de carreras.', ph ? img(ph.id, 900) : '') +
