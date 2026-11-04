@@ -643,7 +643,7 @@ h1{font-family:var(--cond);font-style:italic;font-weight:700;font-size:56px;line
     $('cobText').textContent = COBERTURA_TEXTO;
     var msg = hola() + 'Quiero cotizar la cobertura completa' + (evento ? ' de ' + evento : '') + ' (fotos y/o videos).';
     $('cobWa').href = 'https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(msg);
-    $('cobWa').onclick = function () { track('cotizar_cobertura', { evento: evento || '' }); };
+    $('cobWa').onclick = function () { track('cotizar_cobertura', { evento: evento || '' }); try { fetch(API + '?action=hit&p=wa', { mode: 'no-cors' }); } catch (x) {} };
   }
 
   function renderFolder(id) {
@@ -1171,6 +1171,7 @@ h1{font-family:var(--cond);font-style:italic;font-weight:700;font-size:56px;line
   else {
     view.innerHTML = '<section class="intro"><p class="kicker">CARGANDO EVENTOS…</p></section>';
   }
+  try { if (!sessionStorage.getItem('tm_hit_eventos')) { sessionStorage.setItem('tm_hit_eventos', '1'); fetch(API + '?action=hit&p=eventos', { mode: 'no-cors' }); } } catch (x) {}
   api({ action: 'catalog' }).then(function (data) {
     catalog = data && data.events ? data : { events: [] };
     applySite(catalog.site);

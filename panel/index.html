@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel · Tapir Media</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="../icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,500;0,600;1,700&family=Barlow:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1F1C19; --deep:#171512; --text:#EEE9E4; --muted:#B3AAA2; --soft:#D6CFC8;
+  --c:#5CE6FF; --c-rgb:92,230,255; --on-c:#1F1C19;
+  --line:rgba(var(--c-rgb),.28); --line-soft:rgba(var(--c-rgb),.16);
+  --cond:'Barlow Condensed',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background-color:var(--bg);background-image:linear-gradient(to right,rgba(var(--c-rgb),.04) 1px,transparent 1px);background-size:calc((min(100vw,1280px) - 64px + 24px) / 12) 100%;background-position:center top;color:var(--text);font-family:Barlow,sans-serif;font-weight:300;-webkit-font-smoothing:antialiased}
+a{color:var(--muted);text-decoration:none}a:hover{color:var(--c)}
+button,input,textarea,select{font-family:inherit;color:inherit}
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.14em}
+.k{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--muted)}
+.kc{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--c)}
+.it{font-family:var(--cond);font-style:italic;font-weight:700;letter-spacing:.01em;text-transform:uppercase}
+.neon{color:var(--c);text-shadow:0 0 18px rgba(var(--c-rgb),.6)}
+.cut{clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))}
+.cutsm{clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,9px 100%,0 calc(100% - 9px))}
+@keyframes pulse{0%{transform:translateX(-260px)}100%{transform:translateX(100vw)}}
+@keyframes scan{0%{background-position:-200px 0}100%{background-position:800px 0}}
+@keyframes sp{to{transform:rotate(360deg)}}
+.rail{position:relative;height:1px;background:var(--line);overflow:hidden}
+.rail i{position:absolute;top:-1px;left:0;width:220px;height:3px;background:linear-gradient(90deg,transparent,var(--c),transparent);box-shadow:0 0 12px var(--c);animation:pulse 5.5s linear infinite}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:50px;padding:0 24px;border:0;background:var(--c);color:var(--on-c);font-family:var(--cond);font-weight:600;font-size:15px;letter-spacing:.2em;cursor:pointer;filter:drop-shadow(0 0 10px rgba(var(--c-rgb),.5));transition:filter .2s}
+.btn:hover{filter:drop-shadow(0 0 18px rgba(var(--c-rgb),.85));color:var(--on-c)}
+.btn:disabled{opacity:.5;cursor:default;filter:none}
+.ghost{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 18px;border:0;background:none;box-shadow:inset 0 0 0 1px rgba(var(--c-rgb),.45);color:var(--text);font-family:var(--cond);font-weight:500;font-size:14px;letter-spacing:.16em;cursor:pointer}
+.ghost:hover{background:rgba(var(--c-rgb),.1);color:var(--c)}
+.ghost:disabled{opacity:.45;cursor:default}
+.panel{position:relative;border:1px solid var(--line);background:rgba(14,12,11,.5)}
+.panel>.ph{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 24px;border-bottom:1px solid rgba(var(--c-rgb),.2)}
+.corner{position:absolute;top:-1px;left:-1px;width:16px;height:16px;border-top:2px solid var(--c);border-left:2px solid var(--c)}
+.spin{display:inline-block;width:16px;height:16px;border:1.5px solid rgba(var(--c-rgb),.25);border-top-color:var(--c);border-radius:50%;animation:sp 1s linear infinite;vertical-align:-3px}
+
+/* Header */
+.top{border-bottom:1px solid var(--line);background:rgba(31,28,25,.92);position:sticky;top:0;z-index:20;backdrop-filter:blur(8px)}
+.top .wrap{height:84px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{display:flex;align-items:baseline;gap:16px;color:var(--text)}
+.brand:hover{color:var(--text)}
+.brand .nm{font-family:var(--cond);font-style:italic;font-weight:700;font-size:28px}
+.brand .nm em{font-style:inherit;color:var(--c);text-shadow:0 0 14px rgba(var(--c-rgb),.7)}
+.brand .tag{padding:3px 8px;border:1px solid var(--c);font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--c)}
+.tabs{display:flex;align-items:center;gap:34px;font-family:var(--cond);font-weight:500;font-size:15px;letter-spacing:.22em}
+.tabs a{position:relative;padding:8px 0}
+.tabs a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:var(--c);box-shadow:0 0 8px var(--c);transition:right .3s}
+.tabs a:hover::after,.tabs a[aria-current]::after{right:0}
+.tabs a[aria-current]{color:var(--c)}
+
+main{padding:44px 0 96px}
+.h1{margin:0;font-family:var(--cond);font-style:italic;font-weight:700;font-size:56px;line-height:.9;text-transform:uppercase}
+.head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:16px;margin-bottom:36px}
+.err{margin:0;padding:12px 14px;border:1px solid rgba(255,140,120,.5);color:#ffb4a8;font-size:14px}
+.ok{margin:0;padding:12px 14px;border:1px solid var(--line);color:var(--c);font-size:14px}
+
+/* Login */
+.login{min-height:calc(100vh - 120px);display:flex;align-items:center;justify-content:center;padding:48px 20px}
+.login form{position:relative;width:100%;max-width:440px;padding:48px 44px 40px;border:1px solid rgba(var(--c-rgb),.4);background:rgba(14,12,11,.6);box-shadow:inset 0 0 60px rgba(var(--c-rgb),.06),0 0 40px rgba(var(--c-rgb),.1);display:flex;flex-direction:column;gap:26px}
+.login .c2{position:absolute;bottom:-1px;right:-1px;width:22px;height:22px;border-bottom:2px solid var(--c);border-right:2px solid var(--c)}
+.login .corner{width:22px;height:22px}
+
+/* Campos */
+.fld{width:100%;height:46px;padding:0 14px;background:var(--deep);border:1px solid rgba(var(--c-rgb),.35);color:var(--text);font-size:15px;outline:none;border-radius:0}
+.fld:focus{border-color:var(--c);box-shadow:0 0 12px rgba(var(--c-rgb),.25)}
+textarea.fld{height:auto;padding:12px 14px;line-height:1.55;resize:vertical}
+.fld.num{font-family:var(--mono);font-size:18px}
+.lbl{display:flex;flex-direction:column;gap:8px}
+.busy{background-image:linear-gradient(90deg,transparent,rgba(var(--c-rgb),.18),transparent);background-size:200px 100%;background-repeat:no-repeat;animation:scan 1s linear infinite}
+fieldset{margin:0;padding:24px;border:1px solid var(--line);background:rgba(14,12,11,.5);min-width:0}
+legend{padding:0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--c)}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{height:44px;padding:0 16px;border:0;background:none;box-shadow:inset 0 0 0 1px rgba(var(--c-rgb),.35);color:var(--text);font-family:var(--cond);font-weight:500;font-size:15px;letter-spacing:.06em;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--c);color:var(--on-c);box-shadow:none}
+
+/* Resumen */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;margin-bottom:28px}
+.kpi{padding:24px 24px 22px;display:flex;flex-direction:column;gap:14px}
+.kpi b{font-family:var(--cond);font-weight:500;font-size:46px;line-height:.9}
+.kpi span.n{font-family:var(--mono);font-size:11px;color:var(--c)}
+.chart{height:220px;padding:24px 24px 0;display:flex;align-items:flex-end;gap:6px}
+.chart i{flex:1;min-height:2px;background:rgba(var(--c-rgb),.45);transform:skewX(-12deg);transition:background .15s}
+.chart i.top{background:var(--c);box-shadow:0 0 12px var(--c)}
+.chart i:hover{background:var(--c)}
+.axis{display:flex;justify-content:space-between;padding:10px 24px 16px;border-top:1px solid rgba(var(--c-rgb),.2);font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.cols{display:grid;grid-template-columns:7fr 5fr;gap:24px;margin-top:28px;align-items:start}
+.stack{display:flex;flex-direction:column;gap:24px}
+.qrow{display:grid;grid-template-columns:70px minmax(0,1fr) 130px 110px;align-items:center;gap:16px;padding:14px 24px;border-bottom:1px solid rgba(var(--c-rgb),.12);color:var(--text);cursor:pointer}
+.qrow:hover{background:rgba(var(--c-rgb),.05);color:var(--text)}
+.qrow .cl{font-family:var(--cond);font-weight:500;font-size:18px;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qrow .ev{display:block;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qrow .am{font-family:var(--cond);font-weight:500;font-size:20px;text-align:right}
+.st{justify-self:end;padding:4px 10px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
+.st.enviado{box-shadow:inset 0 0 0 1px var(--c);color:var(--c)}
+.st.aceptado{background:var(--c);color:var(--on-c)}
+.st.borrador{box-shadow:inset 0 0 0 1px rgba(179,170,162,.5);color:var(--muted)}
+.st.rechazado,.st.vencido{box-shadow:inset 0 0 0 1px rgba(179,170,162,.3);color:rgba(179,170,162,.7)}
+.phrow{padding:14px 24px;border-bottom:1px solid rgba(var(--c-rgb),.12);display:flex;flex-direction:column;gap:8px}
+.phrow .t{display:flex;justify-content:space-between;gap:12px;font-size:14px}
+.meter{height:4px;background:rgba(var(--c-rgb),.12);transform:skewX(-30deg)}
+.meter i{display:block;height:4px;background:var(--c);box-shadow:0 0 8px var(--c)}
+.segs{display:grid;grid-template-columns:repeat(20,minmax(0,1fr));gap:4px}
+.segs i{height:10px;transform:skewX(-30deg);background:rgba(var(--c-rgb),.14)}
+.segs i.on{background:var(--c);box-shadow:0 0 6px var(--c)}
+.empty{padding:24px;font-size:14px;color:var(--muted)}
+
+/* Lista de presupuestos */
+.qtable{width:100%;border-collapse:collapse}
+.qtable th{padding:12px 16px;text-align:left;font-family:var(--mono);font-weight:400;font-size:10.5px;letter-spacing:.14em;color:var(--muted);border-bottom:1px solid rgba(var(--c-rgb),.2)}
+.qtable td{padding:14px 16px;border-bottom:1px solid rgba(var(--c-rgb),.12);font-size:14px;vertical-align:middle}
+.qtable tr:hover td{background:rgba(var(--c-rgb),.04)}
+.qtable select{height:36px;padding:0 10px;background:var(--deep);border:1px solid rgba(var(--c-rgb),.35);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.qtable .acts{display:flex;gap:8px;justify-content:flex-end}
+.qtable .acts .ghost{height:36px;padding:0 12px;font-size:12px}
+.tscroll{overflow-x:auto}
+
+/* Editor */
+.ed{display:flex;gap:32px;align-items:flex-start}
+.ed form{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:28px}
+.prev{flex:0 0 420px;position:sticky;top:108px;display:flex;flex-direction:column;gap:14px}
+.paper{aspect-ratio:794/1123;border:1px solid rgba(var(--c-rgb),.45);background:var(--deep);box-shadow:0 0 40px rgba(var(--c-rgb),.12);padding:26px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.paper .t1{display:flex;justify-content:space-between;align-items:baseline}
+.paper .br{font-family:var(--cond);font-style:italic;font-weight:700;font-size:19px}
+.paper .br em{font-style:inherit;color:var(--c)}
+.paper .meta{font-family:var(--mono);font-size:7.5px;color:var(--muted);text-align:right;line-height:1.5}
+.paper .ttl{font-family:var(--cond);font-style:italic;font-weight:700;font-size:26px;line-height:.92;text-transform:uppercase}
+.paper .who{font-family:var(--mono);font-size:7.5px;letter-spacing:.08em;color:var(--c)}
+.paper .body{flex:1;overflow:hidden;font-size:9px;line-height:1.55;color:var(--soft)}
+.paper .body p{margin:0 0 6px}.paper .body ul{margin:0 0 6px;padding-left:13px}
+.paper .tot{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-top:1px solid rgba(var(--c-rgb),.3);border-bottom:1px solid rgba(var(--c-rgb),.3)}
+.paper .tot b{font-family:var(--cond);font-weight:500;font-size:23px;color:var(--c)}
+.paper .cond{font-size:8px;line-height:1.5;color:var(--muted)}
+.edbtns{display:flex;gap:10px;flex-wrap:wrap}
+.edbtns .ghost{flex:1 1 140px}
+
+@media (max-width:1000px){
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cols{grid-template-columns:1fr}
+  .ed{flex-direction:column}
+  .prev{position:static;flex-basis:auto;width:100%;max-width:440px}
+}
+@media (max-width:700px){
+  .wrap{padding:0 20px}
+  .tabs{display:none}
+  .top .wrap{height:64px}
+  .h1{font-size:40px}
+  .g2{grid-template-columns:1fr}
+  .qrow{grid-template-columns:minmax(0,1fr) auto;row-gap:6px}
+  .qrow>span:first-child{display:none}
+  .qrow .am{text-align:left}
+  .mobtabs{display:flex!important}
+}
+.mobtabs{display:none;gap:8px;margin:-16px 0 28px}
+.mobtabs a{flex:1}
+</style>
+</head>
+<body>
+
+<div class="rail"><i></i></div>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#/"><span class="nm">TAPIR<em>MEDIA</em></span><span class="tag">PANEL</span></a>
+    <nav class="tabs" id="tabs" aria-label="Panel" hidden>
+      <a href="#/" data-t="resumen">RESUMEN</a>
+      <a href="#/presupuestos" data-t="presupuestos">PRESUPUESTOS</a>
+      <a href="../" target="_blank" rel="noopener">VER WEB</a>
+      <a href="#/salir">SALIR</a>
+    </nav>
+    <a class="btn cut" id="newBtn" href="#/nuevo" hidden>+ NUEVO PRESUPUESTO</a>
+  </div>
+</header>
+
+<div id="view"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ====== CONFIGURACIÓN ======
+  // La misma dirección del motor que en ../index.html y ../eventos/index.html
+  var API = 'https://script.google.com/macros/s/AKfycbw82wZ04ynTFD076afLckBRGNM4Wg3KZKANYFpdZ4nXja6NGL3a1cjTu7FNbQCAXZJ_bA/exec';
+  // ===========================
+
+  var $ = function (id) { return document.getElementById(id); };
+  var view = $('view');
+  var TOKEN = '';
+  try { TOKEN = localStorage.getItem('tm_panel') || ''; } catch (e) {}
+  var QUOTES = null, SUMMARY = null, ED = null, SITE = {};
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function money(v) { return '$ ' + Math.round(Number(v) || 0).toLocaleString('es-AR'); }
+  function dmy(iso) { var m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? m[3] + '/' + m[2] + '/' + m[1] : ''; }
+  function pad(n) { return String(n).padStart(4, '0'); }
+
+  function call(body) {
+    body.token = TOKEN;
+    return fetch(API, { method: 'POST', body: JSON.stringify(body) }).then(function (r) { return r.json(); }).then(function (d) {
+      if (d && d.auth && body.action !== 'panel_login') { logout(); throw new Error(d.error); }
+      if (d && d.error) throw new Error(d.error);
+      return d;
+    });
+  }
+  function logout() { TOKEN = ''; try { localStorage.removeItem('tm_panel'); } catch (e) {} QUOTES = SUMMARY = null; location.hash = '#/'; route(); }
+
+  // Datos de la marca para la vista previa (los mismos de la web)
+  fetch(API + '?action=site').then(function (r) { return r.json(); }).then(function (d) { SITE = (d && d.site) || {}; }).catch(function () {});
+
+  // ---------- login ----------
+  function renderLogin(msg) {
+    $('tabs').hidden = true; $('newBtn').hidden = true;
+    view.innerHTML = '<section class="login"><form id="loginForm"><span class="corner"></span><span class="c2"></span>' +
+      '<div style="display:flex;flex-direction:column;gap:14px"><h1 class="h1">Panel</h1>' +
+      '<p style="margin:0;font-size:15px;line-height:1.6;color:var(--muted)">Presupuestos, ventas y visitas. Ingresá la clave del equipo.</p></div>' +
+      '<label class="lbl"><span class="k">CLAVE</span><input class="fld" id="clave" type="password" autocomplete="current-password" required style="font-family:var(--mono);font-size:18px;letter-spacing:.2em;height:52px"></label>' +
+      (msg ? '<p class="err">' + esc(msg) + '</p>' : '') +
+      '<button class="btn cut" type="submit" id="loginBtn" style="height:56px">ENTRAR</button>' +
+      '<p class="k" style="margin:0;line-height:1.6">Te recordamos en este navegador por 7 días.</p></form></section>';
+    $('clave').focus();
+    $('loginForm').onsubmit = function (e) {
+      e.preventDefault();
+      var b = $('loginBtn'); b.disabled = true; b.innerHTML = '<span class="spin"></span>';
+      call({ action: 'panel_login', clave: $('clave').value }).then(function (d) {
+        TOKEN = d.token; try { localStorage.setItem('tm_panel', TOKEN); } catch (x) {}
+        route();
+      }).catch(function (err) { renderLogin(err.message); });
+    };
+  }
+
+  function shell(tab) {
+    $('tabs').hidden = false; $('newBtn').hidden = false;
+    document.querySelectorAll('#tabs a[data-t]').forEach(function (a) { if (a.getAttribute('data-t') === tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  }
+  function loading(t) { view.innerHTML = '<main><div class="wrap"><p class="kc"><span class="spin"></span>&nbsp; ' + (t || 'CARGANDO…') + '</p></div></main>'; }
+  function failed(err) { view.innerHTML = '<main><div class="wrap"><p class="err">' + esc(err.message || err) + '</p></div></main>'; }
+  var mobtabs = '<div class="mobtabs"><a class="ghost cutsm" href="#/">RESUMEN</a><a class="ghost cutsm" href="#/presupuestos">PRESUPUESTOS</a><a class="ghost cutsm" href="#/salir">SALIR</a></div>';
+
+  // ---------- resumen ----------
+  function renderSummary() {
+    shell('resumen');
+    if (!SUMMARY) { loading(); call({ action: 'panel_resumen' }).then(function (d) { SUMMARY = d; renderSummary(); }).catch(failed); return; }
+    var s = SUMMARY;
+    var max = Math.max.apply(null, s.visits.map(function (v) { return v.n; }).concat([1]));
+    var top = s.visits.reduce(function (a, v, i) { return v.n > s.visits[a].n ? i : a; }, 0);
+    var sec = { home: 'Portada', eventos: 'Eventos', galeria: 'Galería', clips: 'Clips' };
+    var phMax = Math.max.apply(null, s.byPh.map(function (p) { return p.amount; }).concat([1]));
+    var iaOn = Math.round(Math.min(1, s.ia.used / Math.max(1, s.ia.limit)) * 20);
+    view.innerHTML = '<main><div class="wrap">' + mobtabs +
+      '<div class="head"><h1 class="h1">Resumen <span class="neon">' + esc(s.month) + '</span></h1><span class="k">ACTUALIZADO RECIÉN · <a href="#/" id="refresh" class="kc">ACTUALIZAR</a></span></div>' +
+      '<section class="kpis" aria-label="Indicadores">' +
+        kpi('VENTAS DE FOTOS · MES', money(s.sales), s.photos + (s.photos === 1 ? ' foto' : ' fotos') + ' · ' + s.orders + (s.orders === 1 ? ' pedido' : ' pedidos')) +
+        kpi('PRESUPUESTOS ABIERTOS', String(s.openCount), money(s.openAmount) + ' en juego') +
+        kpi('PRESUPUESTOS CERRADOS · MES', money(s.wonAmount), s.wonCount + (s.wonCount === 1 ? ' aceptado' : ' aceptados')) +
+        kpi('VISITAS · 30 DÍAS', s.visitsTotal.toLocaleString('es-AR'), s.waTotal + ' clics en WhatsApp') +
+      '</section>' +
+      '<section class="panel" aria-label="Visitas"><span class="corner"></span><div class="ph"><span class="kc">VISITAS POR DÍA · ÚLTIMOS 30 DÍAS</span><span class="k">' +
+        s.bySection.map(function (b) { return esc(sec[b.k]).toUpperCase() + ' ' + b.n; }).join(' · ') + '</span></div>' +
+        '<div class="chart">' + s.visits.map(function (v, i) {
+          return '<i' + (i === top && v.n ? ' class="top"' : '') + ' title="' + esc(v.d) + ': ' + v.n + ' visitas · ' + v.wa + ' WhatsApp" style="height:' + Math.round(v.n / max * 100) + '%"></i>';
+        }).join('') + '</div>' +
+        '<div class="axis"><span>' + esc(s.visits[0].d) + '</span><span>' + esc(s.visits[15].d) + '</span><span>HOY</span></div></section>' +
+      '<div class="cols">' +
+        '<section class="panel" aria-label="Presupuestos recientes"><div class="ph"><span class="kc">PRESUPUESTOS RECIENTES</span><a class="kc" href="#/presupuestos">VER TODOS →</a></div>' +
+          (s.recent.length ? s.recent.map(qrow).join('') : '<p class="empty">Todavía no hay presupuestos. <a class="kc" href="#/nuevo">Crear el primero →</a></p>') + '</section>' +
+        '<div class="stack">' +
+          '<section class="panel" aria-label="Ventas por fotógrafo"><div class="ph"><span class="kc">VENTAS DE FOTOS POR FOTÓGRAFO · MES</span></div>' +
+            (s.byPh.length ? s.byPh.map(function (p) {
+              return '<div class="phrow"><div class="t"><span class="kc" style="font-size:12px;letter-spacing:0">' + esc(p.h) + '</span><span>' + money(p.amount) + ' <span style="color:var(--muted)">· ' + p.n + ' fotos</span></span></div>' +
+                '<span class="meter"><i style="width:' + Math.round(p.amount / phMax * 100) + '%"></i></span></div>';
+            }).join('') : '<p class="empty">Sin ventas este mes todavía.</p>') + '</section>' +
+          '<section class="panel" aria-label="Consumo de IA" style="padding:20px 24px;display:flex;flex-direction:column;gap:12px">' +
+            '<div style="display:flex;justify-content:space-between"><span class="kc">BUSCADOR IA · CONSULTAS DEL MES</span><span class="k">' + s.ia.used + ' / ' + s.ia.limit + '</span></div>' +
+            '<div class="segs">' + Array.apply(null, Array(20)).map(function (x, i) { return '<i' + (i < iaOn ? ' class="on"' : '') + '></i>'; }).join('') + '</div>' +
+            '<span style="font-size:13px;color:var(--muted)">Cada consulta cuesta alrededor de 1 centavo de dólar. Al llegar al tope se pausa solo.</span></section>' +
+        '</div></div></div></main>';
+    $('refresh').onclick = function (e) { e.preventDefault(); SUMMARY = null; renderSummary(); };
+  }
+  function kpi(l, v, n) { return '<div class="panel kpi"><span class="corner"></span><span class="k">' + l + '</span><b>' + v + '</b><span class="n">' + esc(n) + '</span></div>'; }
+  function qrow(q) {
+    return '<a class="qrow" href="#/p/' + esc(q.id) + '"><span class="k">N.º ' + pad(q.n) + '</span><span style="min-width:0"><span class="cl">' + esc(q.cliente || 'Sin cliente') + '</span><span class="ev">' + esc(q.evento) + '</span></span>' +
+      '<span class="am">' + money(q.precio) + '</span><span class="st ' + esc(q.estado) + '">' + esc(q.estado) + '</span></a>';
+  }
+
+  // ---------- lista ----------
+  function renderList(msg) {
+    shell('presupuestos');
+    if (!QUOTES) { loading(); call({ action: 'panel_presupuestos' }).then(function (d) { QUOTES = d.quotes; renderList(msg); }).catch(failed); return; }
+    var states = ['borrador', 'enviado', 'aceptado', 'rechazado', 'vencido'];
+    view.innerHTML = '<main><div class="wrap">' + mobtabs +
+      '<div class="head"><h1 class="h1">Presu<span class="neon">puestos</span></h1><a class="btn cut" href="#/nuevo">+ NUEVO</a></div>' +
+      (msg ? '<p class="ok" style="margin-bottom:20px">' + esc(msg) + '</p>' : '') +
+      '<section class="panel"><span class="corner"></span>' + (QUOTES.length ? '<div class="tscroll"><table class="qtable"><thead><tr><th>N.º</th><th>CLIENTE / EVENTO</th><th>CREADO</th><th>VENCE</th><th style="text-align:right">TOTAL</th><th>ESTADO</th><th></th></tr></thead><tbody>' +
+        QUOTES.map(function (q) {
+          return '<tr><td class="k">' + pad(q.n) + '</td><td><b style="font-family:var(--cond);font-weight:500;font-size:17px;letter-spacing:.03em">' + esc(q.cliente || 'Sin cliente') + '</b><br><span style="color:var(--muted);font-size:13px">' + esc(q.evento) + '</span></td>' +
+            '<td class="k">' + dmy(q.creado) + '</td><td class="k">' + dmy(q.vence) + '</td><td style="text-align:right;font-family:var(--cond);font-weight:500;font-size:19px">' + money(q.precio) + '</td>' +
+            '<td><select data-state="' + esc(q.id) + '" aria-label="Estado del presupuesto ' + pad(q.n) + '">' + states.map(function (s) { return '<option value="' + s + '"' + (s === q.estado ? ' selected' : '') + '>' + s + '</option>'; }).join('') + '</select></td>' +
+            '<td><span class="acts">' + (q.pdf ? '<a class="ghost cutsm" href="' + esc(q.pdf) + '" target="_blank" rel="noopener">PDF</a><a class="ghost cutsm" href="' + waLink(q) + '" target="_blank" rel="noopener">WHATSAPP</a>' : '') +
+            '<a class="ghost cutsm" href="#/p/' + esc(q.id) + '">EDITAR</a></span></td></tr>';
+        }).join('') + '</tbody></table></div>' : '<p class="empty">Todavía no hay presupuestos. <a class="kc" href="#/nuevo">Crear el primero →</a></p>') + '</section></div></main>';
+    view.querySelectorAll('select[data-state]').forEach(function (sel) {
+      sel.onchange = function () {
+        sel.disabled = true;
+        call({ action: 'panel_estado', id: sel.getAttribute('data-state'), estado: sel.value }).then(function (d) {
+          QUOTES = QUOTES.map(function (q) { return q.id === d.quote.id ? d.quote : q; }); SUMMARY = null; sel.disabled = false;
+        }).catch(function (err) { alertBox(err.message); sel.disabled = false; });
+      };
+    });
+  }
+  function alertBox(t) { var p = document.createElement('p'); p.className = 'err'; p.textContent = t; view.querySelector('.wrap').prepend(p); }
+  function waLink(q) {
+    var t = 'Hola! Te paso el presupuesto de ' + (SITE.NOMBRE_VISIBLE || 'Tapir Media') + ' para ' + (q.evento || 'el evento') + ': ' + q.pdf;
+    return 'https://wa.me/?text=' + encodeURIComponent(t);
+  }
+
+  // ---------- editor ----------
+  var PAYS = ['Seña 50% + saldo al entregar', 'Transferencia', 'Mercado Pago', 'Efectivo', 'Con factura'];
+  function blank() { return { id: '', n: 0, cliente: '', evento: '', fecha: '', lugar: '', idea: '', texto: '', precio: '', validez: 15, pago: 'Seña 50% + saldo al entregar · Transferencia', pdf: '', estado: 'borrador', creado: '' }; }
+  function renderEditor(id) {
+    shell('presupuestos');
+    if (id && !QUOTES) { loading(); call({ action: 'panel_presupuestos' }).then(function (d) { QUOTES = d.quotes; renderEditor(id); }).catch(failed); return; }
+    if (!ED || (id && ED.id !== id) || (!id && ED.id)) {
+      var found = id && QUOTES && QUOTES.filter(function (q) { return q.id === id; })[0];
+      ED = found ? JSON.parse(JSON.stringify(found)) : blank();
+    }
+    var e = ED;
+    var payOn = function (p) { return e.pago.split(' · ').indexOf(p) >= 0; };
+    var extra = e.pago.split(' · ').filter(function (p) { return p && PAYS.indexOf(p) < 0; }).join(' · ');
+    view.innerHTML = '<main><div class="wrap">' + mobtabs +
+      '<div class="head"><h1 class="h1">' + (e.id ? 'Presupuesto <span class="neon">' + pad(e.n) + '</span>' : 'Nuevo <span class="neon">presupuesto</span>') + '</h1>' +
+        '<span class="k">' + (e.id ? 'ESTADO: ' + esc(e.estado).toUpperCase() : 'SE GUARDA EN LA PLANILLA, PESTAÑA PRESUPUESTOS') + '</span></div>' +
+      '<p class="err" id="edErr" hidden></p>' +
+      '<div class="ed"><form id="edForm" novalidate>' +
+        '<fieldset class="g2"><legend>01 · CLIENTE Y EVENTO</legend>' +
+          fld('cliente', 'CLIENTE', e.cliente) + fld('evento', 'EVENTO', e.evento) + fld('fecha', 'FECHA DEL EVENTO', e.fecha, 'Ej: 13 y 14 de diciembre de 2026') + fld('lugar', 'LUGAR', e.lugar) +
+        '</fieldset>' +
+        '<fieldset style="display:flex;flex-direction:column;gap:16px;border-color:rgba(var(--c-rgb),.5);box-shadow:0 0 30px rgba(var(--c-rgb),.08)"><legend>02 · TEXTO CON IA</legend>' +
+          '<label class="lbl"><span class="k">IDEA (EN POCAS PALABRAS)</span><textarea class="fld" rows="2" data-f="idea" placeholder="Ej: cobertura completa del rally, 2 fotógrafos y 1 filmmaker, reel para redes y fotos para prensa">' + esc(e.idea) + '</textarea></label>' +
+          '<button class="btn cut" type="button" id="aiBtn" style="align-self:flex-start">✦ GENERAR TEXTO CON IA</button>' +
+          '<label class="lbl"><span class="k">TEXTO DEL PRESUPUESTO (PODÉS EDITARLO)</span><textarea class="fld" rows="10" data-f="texto" id="texto" placeholder="Escribilo vos o generalo con la IA. Los renglones que empiezan con - se muestran como lista.">' + esc(e.texto) + '</textarea></label>' +
+        '</fieldset>' +
+        '<fieldset class="g2"><legend>03 · PRECIO Y CONDICIONES</legend>' +
+          '<label class="lbl"><span class="k">PRECIO TOTAL (ARS)</span><input class="fld num" inputmode="numeric" data-f="precio" value="' + esc(e.precio ? Number(e.precio).toLocaleString('es-AR') : '') + '" placeholder="0"></label>' +
+          '<div class="lbl"><span class="k">VALIDEZ DEL PRESUPUESTO</span><div class="chips">' + [7, 15, 30].map(function (d) {
+            return '<button class="chip cutsm" type="button" data-valid="' + d + '" aria-pressed="' + (Number(e.validez) === d) + '" style="flex:1">' + d + ' DÍAS</button>';
+          }).join('') + '</div></div>' +
+          '<div class="lbl" style="grid-column:1/-1"><span class="k">FORMA DE PAGO (PODÉS ELEGIR VARIAS)</span><div class="chips">' + PAYS.map(function (p) {
+            return '<button class="chip cutsm" type="button" data-pay="' + esc(p) + '" aria-pressed="' + payOn(p) + '">' + esc(p) + '</button>';
+          }).join('') + '</div><input class="fld" data-f="pagoExtra" value="' + esc(extra) + '" placeholder="Otra condición (opcional). Ej: 3 cuotas sin interés"></div>' +
+        '</fieldset></form>' +
+        '<aside class="prev" aria-label="Vista previa"><span class="kc">VISTA PREVIA DEL PDF</span><div class="paper" id="paper"></div>' +
+          '<button class="btn cut" type="button" id="pdfBtn" style="height:54px">' + (e.pdf ? 'ACTUALIZAR PDF' : 'GENERAR PDF') + '</button>' +
+          '<div class="edbtns"><a class="ghost cut" id="waBtn" href="#" target="_blank" rel="noopener"' + (e.pdf ? '' : ' hidden') + '>ENVIAR POR WHATSAPP</a>' +
+          '<a class="ghost cut" id="openPdf" href="' + esc(e.pdf) + '" target="_blank" rel="noopener"' + (e.pdf ? '' : ' hidden') + '>VER PDF</a>' +
+          '<button class="ghost cut" type="button" id="saveBtn">GUARDAR BORRADOR</button></div>' +
+          '<span style="font-size:13px;line-height:1.5;color:var(--muted)">Al generar el PDF se guarda en la carpeta PRESUPUESTOS del Drive y el presupuesto pasa a "enviado".</span>' +
+        '</aside></div></div></main>';
+
+    var form = $('edForm');
+    form.addEventListener('input', function (ev) {
+      var f = ev.target.getAttribute('data-f'); if (!f) return;
+      if (f === 'precio') { var d = ev.target.value.replace(/\D/g, ''); e.precio = d; ev.target.value = d ? Number(d).toLocaleString('es-AR') : ''; }
+      else if (f === 'pagoExtra') { setPago(ev.target.value); }
+      else e[f] = ev.target.value;
+      paper();
+    });
+    form.addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b) return;
+      if (b.hasAttribute('data-valid')) { e.validez = Number(b.getAttribute('data-valid')); form.querySelectorAll('[data-valid]').forEach(function (x) { x.setAttribute('aria-pressed', x === b); }); paper(); }
+      if (b.hasAttribute('data-pay')) { b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') !== 'true'); setPago(form.querySelector('[data-f="pagoExtra"]').value); paper(); }
+    });
+    function setPago(extraTxt) {
+      var on = [].slice.call(form.querySelectorAll('[data-pay][aria-pressed="true"]')).map(function (x) { return x.getAttribute('data-pay'); });
+      if (String(extraTxt || '').trim()) on.push(String(extraTxt).trim());
+      e.pago = on.join(' · ');
+    }
+    $('aiBtn').onclick = function () {
+      var b = $('aiBtn'), t = $('texto');
+      if (!String(e.idea || '').trim()) { showErr('Escribí la idea en pocas palabras y la IA arma el texto.'); return; }
+      b.disabled = true; b.textContent = 'GENERANDO…'; t.classList.add('busy');
+      call({ action: 'panel_ia', cliente: e.cliente, evento: e.evento, fecha: e.fecha, lugar: e.lugar, idea: e.idea }).then(function (d) {
+        e.texto = d.text; t.value = d.text; paper(); hideErr();
+      }).catch(function (err) { showErr(err.message); }).then(function () { b.disabled = false; b.textContent = '✦ GENERAR TEXTO CON IA'; t.classList.remove('busy'); });
+    };
+    $('saveBtn').onclick = function () { save(false); };
+    $('pdfBtn').onclick = function () { save(true); };
+    function save(final) {
+      if (!String(e.cliente || e.evento).trim()) { showErr('Completá al menos el cliente o el evento.'); return; }
+      if (final && !Number(e.precio)) { showErr('Falta el precio.'); return; }
+      var b = final ? $('pdfBtn') : $('saveBtn'), lbl = b.textContent;
+      b.disabled = true; b.innerHTML = '<span class="spin"></span>&nbsp; ' + (final ? 'GENERANDO PDF…' : 'GUARDANDO…');
+      call({ action: 'panel_guardar', id: e.id, cliente: e.cliente, evento: e.evento, fecha: e.fecha, lugar: e.lugar, idea: e.idea, texto: e.texto,
+        precio: e.precio, validez: e.validez, pago: e.pago, final: final }).then(function (d) {
+        ED = d.quote; SUMMARY = null;
+        if (QUOTES) { var i = -1; QUOTES.forEach(function (q, k) { if (q.id === d.quote.id) i = k; }); if (i >= 0) QUOTES[i] = d.quote; else QUOTES.unshift(d.quote); }
+        if (location.hash !== '#/p/' + d.quote.id) history.replaceState(null, '', '#/p/' + d.quote.id);
+        renderEditor(d.quote.id);
+        if (final && d.quote.pdf) window.open(d.quote.pdf, '_blank', 'noopener');
+      }).catch(function (err) { showErr(err.message); b.disabled = false; b.textContent = lbl; });
+    }
+    function showErr(t) { var x = $('edErr'); x.textContent = t; x.hidden = false; x.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    function hideErr() { $('edErr').hidden = true; }
+    if (e.pdf) $('waBtn').href = waLink(e);
+    paper();
+  }
+  function fld(f, l, v, ph) { return '<label class="lbl"><span class="k">' + l + '</span><input class="fld" data-f="' + f + '" value="' + esc(v) + '"' + (ph ? ' placeholder="' + esc(ph) + '"' : '') + '></label>'; }
+  function paper() {
+    var e = ED, p = $('paper'); if (!p) return;
+    var created = e.creado ? new Date(e.creado + 'T12:00:00') : new Date();
+    var until = new Date(created.getTime() + (Number(e.validez) || 15) * 864e5);
+    var f = function (d) { return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear(); };
+    var html = '', inList = false;
+    String(e.texto || '').split('\n').map(function (x) { return x.trim(); }).filter(Boolean).forEach(function (l) {
+      if (/^[-•*]\s+/.test(l)) { if (!inList) { html += '<ul>'; inList = true; } html += '<li>' + esc(l.replace(/^[-•*]\s+/, '')) + '</li>'; }
+      else { if (inList) { html += '</ul>'; inList = false; } html += /^incluye:?$/i.test(l) ? '<p style="font-family:var(--mono);font-size:7px;letter-spacing:.14em;color:var(--c)">INCLUYE</p>' : '<p>' + esc(l) + '</p>'; }
+    });
+    if (inList) html += '</ul>';
+    var brand = String(SITE.MARCA || 'TAPIRMEDIA').toUpperCase(), k = brand.indexOf('MEDIA');
+    p.innerHTML = '<div class="t1"><span class="br">' + (k > 0 ? esc(brand.slice(0, k)) + '<em>' + esc(brand.slice(k)) + '</em>' : esc(brand)) + '</span>' +
+      '<span class="meta">PRESUPUESTO N.º ' + (e.n ? pad(e.n) : '----') + '<br>EMITIDO ' + f(created) + '<br>VÁLIDO HASTA ' + f(until) + '</span></div>' +
+      '<span style="height:1px;background:rgba(var(--c-rgb),.4)"></span>' +
+      '<span class="ttl">' + esc(e.evento || 'Presupuesto') + '</span>' +
+      '<span class="who">' + esc([e.cliente, e.fecha, e.lugar].filter(Boolean).join(' · ').toUpperCase()) + '</span>' +
+      '<div class="body">' + (html || '<p style="color:var(--muted)">El texto del presupuesto aparece acá.</p>') + '</div>' +
+      '<div class="tot"><span class="k" style="font-size:7px">TOTAL</span><b>' + money(e.precio) + '</b></div>' +
+      '<span class="cond">Forma de pago: ' + esc(e.pago || 'a convenir') + '</span>';
+  }
+
+  // ---------- rutas ----------
+  function route() {
+    var h = location.hash.replace(/^#\/?/, '');
+    if (h === 'salir') { logout(); return; }
+    if (!TOKEN) { renderLogin(); return; }
+    if (h === 'presupuestos') renderList();
+    else if (h === 'nuevo') { if (ED && ED.id) ED = null; renderEditor(''); }
+    else if (/^p\//.test(h)) renderEditor(h.slice(2));
+    else renderSummary();
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', route);
+  route();
+})();
+</script>
+</body>
+</html>

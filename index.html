@@ -371,6 +371,11 @@ a.btn,a.btn:hover{color:var(--on-c)}
     return out;
   }
   function lines(v) { return String(v || '').split(/\n|;/).map(function (x) { return x.trim(); }).filter(Boolean); }
+  // Contador de visitas del panel: una por sección y por sesión, sin datos personales
+  function hit(page) {
+    try { if (sessionStorage.getItem('tm_hit_' + page)) return; sessionStorage.setItem('tm_hit_' + page, '1'); } catch (x) {}
+    try { fetch(API + '?action=hit&p=' + encodeURIComponent(page), { mode: 'no-cors' }); } catch (x) {}
+  }
   function track(name, p) { try { if (window.gtag) gtag('event', name, p || {}); } catch (x) {} }
 
   function api(params) {
@@ -494,7 +499,7 @@ a.btn,a.btn:hover{color:var(--on-c)}
           encodeURIComponent(hola() + 'Quiero consultar por la cobertura de un evento.') + '">ESCRIBINOS POR WHATSAPP<span class="speed"><b></b><b></b><b></b></span></a></div>' : '') +
       '</div></section>';
     if ($('tele') && ev) $('tele').textContent = 'ÚLTIMO EVENTO · ' + clean(ev.name).toUpperCase();
-    if ($('waBtn')) $('waBtn').onclick = function () { track('contacto_whatsapp'); };
+    if ($('waBtn')) $('waBtn').onclick = function () { track('contacto_whatsapp'); try { fetch(API + '?action=hit&p=wa', { mode: 'no-cors' }); } catch (x) {} };
     startFacts(facts);
     fitBio();
   }
@@ -616,6 +621,7 @@ a.btn,a.btn:hover{color:var(--on-c)}
     closeLb();
     document.querySelectorAll('.nav a[data-r]').forEach(function (a) { if (a.getAttribute('data-r') === r) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     if (r !== '' && r !== 'contacto') clearInterval(factTimer);
+    hit(r === 'galeria' || r === 'clips' ? r : 'home');
     if (r === 'galeria') renderGallery();
     else if (r === 'clips') renderClips();
     else {
