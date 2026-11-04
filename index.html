@@ -71,16 +71,17 @@ a.btn,a.btn:hover{color:var(--on-c)}
 .tele .wrap{height:32px;display:flex;align-items:center;justify-content:space-between;gap:16px;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--muted);white-space:nowrap;overflow:hidden}
 .tele .dot{display:inline-block;width:6px;height:6px;margin-right:10px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c);vertical-align:1px}
 .top{position:sticky;top:0;z-index:20;background:rgba(31,28,25,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-.top .wrap{height:88px;display:flex;align-items:center;justify-content:space-between;gap:24px}
-.brand{display:flex;align-items:center;gap:12px;color:var(--text)}
+.top .wrap{height:96px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{flex:none;display:flex;align-items:center;gap:12px;color:var(--text)}
 .brand:hover{color:var(--text)}
 .brand .mk{display:none}
 .brand .nm{font-family:var(--cond);font-style:italic;font-weight:700;font-size:30px;letter-spacing:.02em}
 .brand .nm em{font-style:inherit;color:var(--c);text-shadow:0 0 14px rgba(var(--c-rgb),.7)}
-.brand img{max-height:40px;max-width:220px}
+.brand img.full{height:54px;max-height:none;width:auto;max-width:280px}
+.brand img{max-height:54px}
 .brand .ico{height:36px;width:36px;object-fit:contain}
 .brand.both .ico{display:none}
-.nav{display:flex;align-items:center;gap:44px;font-family:var(--cond);font-weight:500;font-size:15px;letter-spacing:.24em}
+.nav{flex:none;display:flex;align-items:center;gap:36px;font-family:var(--cond);font-weight:500;font-size:15px;letter-spacing:.24em}
 .nav .nl{position:relative;padding:8px 0}
 .nav .nl small{margin-right:8px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--c)}
 .nav .nl::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:var(--c);box-shadow:0 0 8px var(--c);transition:right .3s}
@@ -89,12 +90,10 @@ a.btn,a.btn:hover{color:var(--on-c)}
 .nav .btn{height:46px;padding:0 26px;font-size:15px}
 
 /* Logos de campeonatos */
-.logos{border-bottom:1px solid var(--line)}
-.logos .row{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);align-items:center;height:120px;overflow-x:auto;scrollbar-width:none}
-.logos .row::-webkit-scrollbar{display:none}
-.logos .row img{justify-self:center;height:56px;width:auto;max-width:180px;object-fit:contain;opacity:.92;transition:opacity .2s;mix-blend-mode:screen}
-.logos .row img:first-child{justify-self:start}.logos .row img:last-child{justify-self:end}
-.logos .row img:hover{opacity:1}
+.hlogos{flex:1 1 auto;min-width:0;display:flex;align-items:center;justify-content:space-evenly;gap:22px;padding:0 28px}
+.hlogos img{flex:0 1 auto;min-width:0;height:36px;width:auto;max-width:104px;object-fit:contain;opacity:.9;transition:opacity .2s;mix-blend-mode:screen}
+.hlogos img:hover{opacity:1}
+.hlogos:empty{display:none}
 .ruler{height:8px;background-image:linear-gradient(to right,rgba(var(--c-rgb),.5) 1px,transparent 1px);background-size:16px 100%}
 
 /* Portada: apartados */
@@ -122,11 +121,14 @@ a.btn,a.btn:hover{color:var(--on-c)}
 
 /* Tapirteam */
 .bio .wrap{padding-top:56px;padding-bottom:104px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;row-gap:48px}
-.bio .txt{grid-column:1 / span 5;display:flex;flex-direction:column;gap:20px}
-.bio .txt h2{margin:0;font-size:64px;line-height:.9}
-.bio .txt .lead{display:flex;flex-direction:column;gap:14px;max-width:520px}
-.bio .txt .lead p{margin:0;font-size:16px;line-height:1.65;color:var(--muted)}
-.bio .txt .lead p:first-child{font-family:var(--cond);font-weight:500;font-size:26px;line-height:1.15;letter-spacing:.03em;color:var(--text)}
+.bio .ttl{grid-column:1 / -1;margin:0 0 -16px}
+.bio .txt{grid-column:1 / span 5;align-self:start;display:flex;flex-direction:column}
+.bio .ttl h2{margin:0;font-size:64px;line-height:.9}
+.bio .txt .lead{display:flex;flex-direction:column;justify-content:space-between;gap:.8em;height:100%}
+.bio .txt .lead p{margin:0;line-height:1.55;color:var(--muted)}
+.bio .txt .lead p:first-child{font-family:var(--cond);font-weight:500;font-size:1.5em;line-height:1.15;letter-spacing:.03em;color:var(--text)}
+.bio .txt .lead{font-size:15px}
+.bio .txt .lead p{font-size:1em}
 .team{grid-column:7 / span 6;align-self:start;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
 .member{display:flex;flex-direction:column;gap:14px}
 .member .fr{position:relative}
@@ -227,6 +229,10 @@ a.btn,a.btn:hover{color:var(--on-c)}
 .lb .nv{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:64px;border:0;background:none;color:var(--c);font-size:30px;cursor:pointer}
 .lb .pv{left:12px}.lb .nx{right:12px}
 
+@media (max-width:1240px){
+  .top .wrap{flex-wrap:wrap;height:auto;padding-top:14px;padding-bottom:0;row-gap:0}
+  .hlogos{order:3;flex-basis:100%;height:64px;margin-top:12px;border-top:1px solid var(--line-soft);padding:0;justify-content:space-between}
+}
 @media (max-width:900px){
   :root{--pad:20px}
   .nav .nl{display:none}
@@ -235,16 +241,17 @@ a.btn,a.btn:hover{color:var(--on-c)}
   .brand.both .full{display:none}
   .nav .btn{height:40px;padding:0 16px;font-size:13px}
   .brand .nm{font-size:24px;letter-spacing:.02em}
-  .top .wrap{height:64px}
-  .tele .wrap span:last-child{display:none}
+  .top .wrap{height:auto;min-height:64px;padding-top:10px}
+  .tele .wrap>span:last-child{display:none}
   .doors{grid-template-columns:1fr;gap:14px;padding:18px 0 48px}
   .door{height:220px}
   .door .in{padding:16px 20px}
   .door .big{font-size:72px}
   .door .lbl{font-size:36px}
   .door .sub{display:none}
-  .logos .row{height:72px;grid-auto-columns:minmax(80px,1fr);gap:16px}
-  .logos .row img{height:34px;max-width:110px}
+  .hlogos{height:52px;gap:14px}
+  .hlogos img{height:26px;max-width:84px}
+  .brand img.full{height:40px}
   .bio .wrap,.contact .wrap{grid-template-columns:1fr;padding-top:48px;padding-bottom:56px}
   .bio .txt,.team,.contact .l,.contact .r{grid-column:1 / -1}
   .bio .txt h2{font-size:48px}
@@ -275,6 +282,7 @@ a.btn,a.btn:hover{color:var(--on-c)}
 <header class="top">
   <div class="wrap">
     <a class="brand" id="brand" href="#/"><span class="nm">TAPIR<em>MEDIA</em></span></a>
+    <div class="hlogos" id="hlogos" aria-label="Campeonatos que cubrimos"></div>
     <nav class="nav" aria-label="Principal">
       <a class="nl" href="eventos/"><small>01</small>EVENTOS</a>
       <a class="nl" href="#/galeria" data-r="galeria"><small>02</small>GALERÍA</a>
@@ -422,6 +430,9 @@ a.btn,a.btn:hover{color:var(--on-c)}
     if (!d || !d.site) return;
     applySite(d.site);
     G = d.gallery || G; EVENTS = d.events || [];
+    $('hlogos').innerHTML = (G.logos || []).map(function (l) {
+      return '<img src="' + img(l.id, 400) + '" alt="' + esc(l.n) + '" title="' + esc(l.n) + '">';
+    }).join('');
     loaded = true;
   }
 
@@ -449,12 +460,8 @@ a.btn,a.btn:hover{color:var(--on-c)}
       return k > 0 ? { t: x.slice(0, k).trim(), x: x.slice(k + 1).trim() } : { t: '', x: x };
     });
     var num = wa(), ig = String(SITE.INSTAGRAM || '').replace(/^@/, '');
-    var logos = (G.logos || []).map(function (l, k) {
-      return '<img loading="lazy" src="' + img(l.id, 600) + '" alt="' + esc(l.n) + '" title="' + esc(l.n) + '">';
-    }).join('');
     var nPh = G.photos.length, nCl = G.clips.length;
     view.innerHTML =
-      (logos ? '<section class="logos" aria-label="Campeonatos que cubrimos"><div class="wrap"><div class="row">' + logos + '</div><div class="ruler"></div></div></section>' : '') +
       '<div class="wrap"><section class="doors" aria-label="Apartados">' +
         door('01', 'eventos/', 'EVENTOS', 'Comprá tus fotos de cada fecha.', 'COMPRAR FOTOS', ev && ev.cover ? img(ev.cover, 900) : '') +
         door('02', '#/galeria', 'GALERÍA', 'Nuestras mejores fotos de carreras.', nPh + (nPh === 1 ? ' FOTO' : ' FOTOS'), ph ? img(ph.id, 900) : '') +
@@ -462,7 +469,7 @@ a.btn,a.btn:hover{color:var(--on-c)}
       '</section></div>' +
       ((SITE.BIO_TEXTO || team) ? '<div class="wrap"><div class="sep"><span>// ' + esc(String(SITE.BIO_TITULO || 'NOSOTROS').toUpperCase()) + '</span><i></i><em></em></div></div>' +
         '<section class="bio" id="nosotros" aria-label="Nosotros"><div class="wrap">' +
-        '<div class="txt"><h2 class="it">' + neonTitle(SITE.BIO_TITULO || SITE.MARCA || '') + '</h2>' +
+        '<div class="ttl"><h2 class="it">' + neonTitle(SITE.BIO_TITULO || SITE.MARCA || '') + '</h2></div><div class="txt">' +
         (SITE.BIO_TEXTO ? '<div class="lead">' + String(SITE.BIO_TEXTO).split(/\n+/).map(function (x) { return x.trim(); }).filter(Boolean)
           .map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') + '</div>' : '') + '</div>' +
         (team ? '<div class="team">' + team + '</div>' : '') + '</div></section>' : '') +
@@ -489,7 +496,24 @@ a.btn,a.btn:hover{color:var(--on-c)}
     if ($('tele') && ev) $('tele').textContent = 'ÚLTIMO EVENTO · ' + clean(ev.name).toUpperCase();
     if ($('waBtn')) $('waBtn').onclick = function () { track('contacto_whatsapp'); };
     startFacts(facts);
+    fitBio();
   }
+
+  // El bloque de texto de Nosotros mide siempre lo mismo que las fotos del equipo: achica la letra hasta que entra.
+  function fitBio() {
+    var txt = document.querySelector('.bio .txt'), pic = document.querySelector('.bio .member .pic'), lead = document.querySelector('.bio .txt .lead');
+    if (!txt || !lead) return;
+    txt.style.height = ''; lead.style.fontSize = '';
+    if (!pic || window.matchMedia('(max-width:900px)').matches) return;
+    var h = pic.getBoundingClientRect().height;
+    txt.style.height = h + 'px';
+    var size = 17;
+    lead.style.fontSize = size + 'px';
+    while (lead.scrollHeight > h + 1 && size > 12) { size -= 0.25; lead.style.fontSize = size + 'px'; }
+    if (lead.scrollHeight > h + 1) txt.style.height = '';
+  }
+  window.addEventListener('resize', function () { clearTimeout(fitBio.t); fitBio.t = setTimeout(fitBio, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitBio(); });
 
   function startFacts(facts) {
     clearInterval(factTimer);
