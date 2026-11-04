@@ -54,9 +54,10 @@ a.btn,a.btn:hover{color:var(--on-c)}
 .doors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;padding:64px 0 96px}
 .door{position:relative;height:480px;display:flex;flex-direction:column;justify-content:flex-end;gap:12px;padding:32px;color:var(--text);overflow:hidden;box-shadow:0 0 0 1px rgba(var(--c-rgb),.45),0 0 24px rgba(var(--c-rgb),.12);transition:box-shadow .2s}
 .door:hover{color:var(--text);box-shadow:0 0 0 1px var(--c),0 0 30px rgba(var(--c-rgb),.6),0 0 80px rgba(var(--c-rgb),.25)}
-.door .bgimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.42;transition:opacity .3s,transform .6s}
-.door:hover .bgimg{opacity:.55;transform:scale(1.03)}
-.door .shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(28,25,22,.92),rgba(28,25,22,.1) 60%)}
+.door .bgimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.door:hover .bgimg{transform:scale(1.03)}
+.door .shade{position:absolute;left:0;right:0;bottom:0;height:45%;background:linear-gradient(to top,rgba(20,18,16,.78),rgba(20,18,16,0))}
+.door .lbl,.door .sub,.door .num{text-shadow:0 1px 12px rgba(0,0,0,.55)}
 .door>span{position:relative}
 .door .num{position:absolute;top:28px;left:32px;right:32px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--c)}
 .door .lbl{font-family:var(--cond);font-weight:500;font-size:56px;line-height:1;letter-spacing:.06em;transition:color .2s,text-shadow .2s}
@@ -73,14 +74,22 @@ a.btn,a.btn:hover{color:var(--on-c)}
 .member .pic{aspect-ratio:4/5;border:1px solid var(--line);overflow:hidden;display:flex;align-items:center;justify-content:center}
 .member .pic img{width:100%;height:100%;object-fit:cover}
 .member h3{margin:0;font-family:var(--cond);font-weight:500;font-size:20px;letter-spacing:.08em;text-transform:uppercase}
+.member h3{overflow-wrap:anywhere}
+.member h3.hd{font-family:var(--mono);font-weight:400;font-size:13px;letter-spacing:.04em;text-transform:none;color:var(--c)}
 .member span{font-family:var(--mono);font-size:12px;color:var(--c)}
 
 .facts{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .facts .wrap{padding-top:40px;padding-bottom:40px;display:flex;flex-wrap:wrap;align-items:center;gap:24px 40px}
 .facts .hd{flex:none;width:200px;display:flex;flex-direction:column;gap:8px}
-.facts .hd b{font-weight:400;font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--c);text-shadow:0 0 12px rgba(var(--c-rgb),.6)}
+.facts .hd b{font-weight:400;font-family:var(--mono);font-size:12px;letter-spacing:.14em;line-height:1.6;color:var(--c);text-shadow:0 0 12px rgba(var(--c-rgb),.6);text-transform:uppercase}
 .facts .hd span{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted)}
-.facts p{flex:1 1 420px;min-width:0;min-height:64px;margin:0;display:flex;align-items:center;font-family:var(--cond);font-size:28px;line-height:1.15;letter-spacing:.02em;transition:opacity .35s}
+.facts .ft{flex:1 1 420px;min-width:0;min-height:132px;display:flex;flex-direction:column;justify-content:center;gap:12px;transition:opacity .35s}
+.facts .ft h3{margin:0;font-family:var(--cond);font-weight:500;font-size:30px;line-height:1.05;letter-spacing:.04em;text-transform:uppercase;color:var(--text)}
+.facts .ft h3 em{font-style:normal;color:var(--c);margin-right:14px;text-shadow:0 0 12px rgba(var(--c-rgb),.6)}
+.facts .ft p{margin:0;max-width:760px;font-size:18px;line-height:1.55;color:var(--muted)}
+.facts .end{flex-basis:100%;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 32px;padding-top:8px}
+.facts .end b{font-weight:400;font-family:var(--cond);font-size:20px;letter-spacing:.04em;color:var(--text)}
+.facts .end small{max-width:520px;font-size:12px;line-height:1.5;color:var(--muted)}
 .facts .ctl{flex:none;display:flex;gap:16px}
 .facts .ctl button{width:44px;height:44px;border:0;background:none;color:var(--c);cursor:pointer;box-shadow:0 0 0 1px rgba(var(--c-rgb),.4);font-size:18px}
 .facts .ticks{flex-basis:100%;display:grid;gap:6px}
@@ -164,7 +173,9 @@ a.btn,a.btn:hover{color:var(--on-c)}
   .bio .txt,.team,.contact .l,.contact .r{grid-column:1 / -1}
   .team{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
   .member h3{font-size:15px}
-  .facts p{font-size:22px}
+  .facts .ft h3{font-size:24px}
+  .facts .ft p{font-size:16px}
+  .facts .ft{min-height:190px}
   .h1{font-size:44px}
   .clips{grid-template-columns:1fr}
   .masonry{columns:2 150px;column-gap:8px}
@@ -232,8 +243,39 @@ a.btn,a.btn:hover{color:var(--on-c)}
   function dur(s) { s = Number(s) || 0; return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
   function date(t) { return t && t.length >= 8 ? t.slice(6, 8) + '/' + t.slice(4, 6) + '/' + t.slice(0, 4) : ''; }
   function phone(d) { d = String(d || ''); return /^549\d{10}$/.test(d) ? '+54 9 ' + d.slice(3, 6) + ' ' + d.slice(6, 9) + '-' + d.slice(9) : (d ? '+' + d : ''); }
-  function wa() { return String(SITE.WHATSAPP || '').replace(/\D/g, ''); }
+  // WHATSAPP puede tener varios contactos: "Lucas | 3513020815 ; Fran | 351...". El botón usa el primero.
+  function normPhone(d) {
+    d = String(d || '').replace(/\D/g, '').replace(/^0+/, '');
+    if (/^54/.test(d)) { if (!/^549/.test(d) && d.length === 12) d = '549' + d.slice(2); return d; }
+    if (d.length === 10) return '549' + d;
+    if (d.length === 11 && d.charAt(0) === '9') return '54' + d;
+    return d;
+  }
+  function contacts() {
+    return String(SITE.WHATSAPP || '').split(/\n|;|,|\//).map(function (e) {
+      var m = e.match(/\+?[\d][\d\s().-]{7,}\d/);
+      if (!m) return null;
+      var name = e.replace(m[0], '').replace(/[|:\-–]+/g, ' ').trim();
+      return { name: name, num: normPhone(m[0]) };
+    }).filter(Boolean);
+  }
+  function wa() { var c = contacts()[0]; return c ? c.num : ''; }
   function hola() { return 'Hola' + (SITE.NOMBRE_SALUDO ? ' ' + SITE.NOMBRE_SALUDO : '') + '! '; }
+  // EQUIPO acepta "Nombre | @usuario ; ..." o solo usuarios ("@uno @dos @tres"). Vacío = las fotos de _EQUIPO.
+  function key(h) { return String(h || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
+  function teamList() {
+    var raw = String(SITE.EQUIPO || '').trim(), out = [];
+    if (!raw) return G.team.map(function (t) { return { name: '', h: t.h, pic: t }; });
+    raw.split(/\n|;/).forEach(function (row) {
+      row = row.trim(); if (!row) return;
+      var hs = row.match(/@[A-Za-z0-9._]+/g) || [];
+      var name = row.replace(/@[A-Za-z0-9._]+/g, '').replace(/[|,]+/g, ' ').replace(/\s+/g, ' ').trim();
+      if (hs.length > 1 || (!name && hs.length)) hs.forEach(function (h) { out.push({ name: '', h: h.toLowerCase() }); });
+      else out.push({ name: name, h: (hs[0] || '').toLowerCase() });
+    });
+    out.forEach(function (m) { m.pic = m.h ? G.team.filter(function (t) { return key(t.h) === key(m.h); })[0] : null; });
+    return out;
+  }
   function lines(v) { return String(v || '').split(/\n|;/).map(function (x) { return x.trim(); }).filter(Boolean); }
   function track(name, p) { try { if (window.gtag) gtag('event', name, p || {}); } catch (x) {} }
 
@@ -284,14 +326,15 @@ a.btn,a.btn:hover{color:var(--on-c)}
         '<span class="num"><span>' + n + '</span><span>→</span></span>' +
         '<span class="lbl">' + label + '</span><span class="sub">' + sub + '</span></a>';
     }
-    var team = lines(SITE.EQUIPO).map(function (row) {
-      var p = row.split('|').map(function (x) { return x.trim(); });
-      var h = (p[1] || '').toLowerCase();
-      var pic = h && G.team.filter(function (t) { return t.h === h; })[0];
-      return '<article class="member"><div class="pic tile">' + (pic ? '<img loading="lazy" src="' + img(pic.id, 600) + '" alt="' + esc(p[0]) + '">' : '') + '</div>' +
-        '<h3>' + esc(p[0]) + '</h3>' + (p[1] ? '<span>' + esc(p[1]) + '</span>' : '') + '</article>';
+    var team = teamList().map(function (m) {
+      return '<article class="member"><div class="pic tile">' + (m.pic ? '<img loading="lazy" src="' + img(m.pic.id, 600) + '" alt="' + esc(m.name || m.h) + '">' : '') + '</div>' +
+        '<h3' + (m.name ? '' : ' class="hd"') + '>' + esc(m.name || m.h) + '</h3>' + (m.name && m.h ? '<span>' + esc(m.h) + '</span>' : '') + '</article>';
     }).join('');
-    var facts = lines(String(SITE.CURIOSIDADES || '').replace(/;/g, '\u0000')).map(function (x) { return x.replace(/\u0000/g, ';'); });
+    // CURIOSIDADES: una por renglón, "TÍTULO | texto" (el título es opcional)
+    var facts = String(SITE.CURIOSIDADES || '').split('\n').map(function (x) { return x.trim(); }).filter(Boolean).map(function (x) {
+      var k = x.indexOf('|');
+      return k > 0 ? { t: x.slice(0, k).trim(), x: x.slice(k + 1).trim() } : { t: '', x: x };
+    });
     var num = wa(), ig = String(SITE.INSTAGRAM || '').replace(/^@/, '');
     view.innerHTML =
       '<div class="wrap"><section class="doors" aria-label="Apartados">' +
@@ -304,13 +347,19 @@ a.btn,a.btn:hover{color:var(--on-c)}
         (SITE.BIO_TEXTO ? '<p class="lead">' + esc(SITE.BIO_TEXTO) + '</p>' : '') + '</div>' +
         (team ? '<div class="team">' + team + '</div>' : '') + '</div></section>' : '') +
       (facts.length ? '<section class="facts" aria-label="Curiosidades" aria-live="polite"><div class="wrap">' +
-        '<div class="hd"><b>¿SABÍAS QUE…?</b><span id="fNum"></span></div><p id="fTxt"></p>' +
+        '<div class="hd"><b>' + esc(SITE.CURIOSIDADES_TITULO || '¿Sabías que…?') + '</b><span id="fNum"></span></div>' +
+        '<div class="ft" id="fBox"><h3 id="fTit"></h3><p id="fTxt"></p></div>' +
         '<div class="ctl"><button type="button" id="fPrev" aria-label="Anterior">‹</button><button type="button" id="fNext" aria-label="Siguiente">›</button></div>' +
         '<div class="ticks" aria-hidden="true" style="grid-template-columns:repeat(' + facts.length + ',minmax(0,1fr))">' + facts.map(function () { return '<i></i>'; }).join('') + '</div>' +
+        ((SITE.CURIOSIDADES_CIERRE || SITE.CURIOSIDADES_NOTA) ? '<div class="end">' + (SITE.CURIOSIDADES_CIERRE ? '<b>' + esc(SITE.CURIOSIDADES_CIERRE) + '</b>' : '<span></span>') +
+          (SITE.CURIOSIDADES_NOTA ? '<small>' + esc(SITE.CURIOSIDADES_NOTA) + '</small>' : '') + '</div>' : '') +
         '</div></section>' : '') +
       '<section class="contact" id="contacto" aria-label="Contacto"><div class="wrap">' +
         '<div class="l"><p class="kick">CONTACTO</p><h2>Contratanos para tu próximo evento</h2><dl>' +
-          (num ? '<dt>WHATSAPP</dt><dd><a href="https://wa.me/' + num + '" target="_blank" rel="noopener">' + esc(phone(num)) + '</a></dd>' : '') +
+          contacts().map(function (c, k) {
+            return '<dt>' + (k ? '' : 'WHATSAPP') + '</dt><dd><a href="https://wa.me/' + c.num + '" target="_blank" rel="noopener">' + esc(phone(c.num)) + '</a>' +
+              (c.name ? ' <span style="color:var(--muted)">· ' + esc(c.name) + '</span>' : '') + '</dd>';
+          }).join('') +
           (SITE.MAIL_CONTACTO ? '<dt>MAIL</dt><dd><a href="mailto:' + esc(SITE.MAIL_CONTACTO) + '">' + esc(SITE.MAIL_CONTACTO) + '</a></dd>' : '') +
           (ig ? '<dt>INSTAGRAM</dt><dd><a href="https://instagram.com/' + esc(ig) + '" target="_blank" rel="noopener">@' + esc(ig) + '</a></dd>' : '') +
         '</dl></div>' +
@@ -328,17 +377,20 @@ a.btn,a.btn:hover{color:var(--on-c)}
     factI = factI % facts.length;
     function show(i) {
       factI = (i + facts.length) % facts.length;
-      var p = $('fTxt'); if (!p) return;
-      p.style.opacity = 0;
+      var box = $('fBox'); if (!box) return;
+      box.style.opacity = 0;
       setTimeout(function () {
-        if (!$('fTxt')) return;
-        p.textContent = facts[factI];
-        p.style.opacity = 1;
-        $('fNum').textContent = 'TAPIR ' + String(factI + 1).padStart(2, '0') + ' / ' + String(facts.length).padStart(2, '0');
+        if (!$('fBox')) return;
+        var f = facts[factI], n = String(factI + 1).padStart(2, '0');
+        $('fTit').innerHTML = '<em>' + n + '.</em>' + esc(f.t);
+        $('fTit').hidden = !f.t;
+        $('fTxt').textContent = f.x;
+        box.style.opacity = 1;
+        $('fNum').textContent = n + ' / ' + String(facts.length).padStart(2, '0');
         document.querySelectorAll('.facts .ticks i').forEach(function (t, k) { t.className = k === factI ? 'on' : ''; });
       }, 200);
     }
-    function restart() { clearInterval(factTimer); factTimer = setInterval(function () { show(factI + 1); }, 6000); }
+    function restart() { clearInterval(factTimer); factTimer = setInterval(function () { show(factI + 1); }, 9000); }
     $('fPrev').onclick = function () { show(factI - 1); restart(); };
     $('fNext').onclick = function () { show(factI + 1); restart(); };
     show(factI); restart();

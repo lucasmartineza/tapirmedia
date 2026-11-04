@@ -11,9 +11,9 @@
 <link id="fontLink" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#000; --panel:rgba(255,255,255,.035); --line:rgba(var(--accent-rgb),.2); --line-2:rgba(var(--accent-rgb),.38);
+  --bg:#24201D; --panel:rgba(255,255,255,.035); --line:rgba(var(--accent-rgb),.2); --line-2:rgba(var(--accent-rgb),.38);
   --text:rgba(255,255,255,.86); --muted:rgba(255,255,255,.58); --white:#fff;
-  --gutter:40px; --accent:#fff; --on-accent:#000; --accent-rgb:255,255,255; --font:Montserrat;
+  --gutter:40px; --accent:#5CE6FF; --on-accent:#24201D; --accent-rgb:92,230,255; --font:Montserrat;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -374,7 +374,14 @@ a.btn.ghost,a.btn.ghost:hover{color:#fff}
   function applySite(s) {
     if (!s || !s.MARCA) return;
     SITE = s;
-    WHATSAPP = String(s.WHATSAPP || '').replace(/\D/g, '');
+    // WHATSAPP puede tener varios contactos ("Lucas | 3513020815 ; Fran | ..."): la tienda usa el primero.
+    WHATSAPP = (function (v) {
+      var m = String(v || '').match(/\+?\d[\d\s().-]{7,}\d/);
+      var d = m ? m[0].replace(/\D/g, '').replace(/^0+/, '') : '';
+      if (/^54/.test(d)) return (!/^549/.test(d) && d.length === 12) ? '549' + d.slice(2) : d;
+      if (d.length === 10) return '549' + d;
+      return d;
+    })(s.WHATSAPP);
     COBERTURA_TEXTO = s.COBERTURA_TEXTO || '';
     TIERS = (s.TIERS || [[1, 0]]).map(function (t, i, all) {
       var next = all[i + 1];
@@ -383,8 +390,9 @@ a.btn.ghost,a.btn.ghost:hover{color:#fff}
     });
     var root = document.documentElement.style;
     var bg = hexRgb(s.COLOR_FONDO), ac = hexRgb(s.COLOR_ACENTO);
-    if (bg) root.setProperty('--bg', s.COLOR_FONDO);
-    if (ac) {
+    // Tapir: si la planilla quedó con los colores por defecto (negro/blanco), se mantiene el gris topo y el celeste.
+    if (bg && !/^#0{3}(0{3})?$/.test(s.COLOR_FONDO)) root.setProperty('--bg', s.COLOR_FONDO);
+    if (ac && !/^#f{3}(f{3})?$/i.test(s.COLOR_ACENTO)) {
       root.setProperty('--accent', s.COLOR_ACENTO);
       root.setProperty('--accent-rgb', ac.join(','));
       root.setProperty('--on-accent', (ac[0] * 299 + ac[1] * 587 + ac[2] * 114) / 1000 > 150 ? '#000' : '#fff');
