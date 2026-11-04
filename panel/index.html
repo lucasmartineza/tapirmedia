@@ -476,8 +476,15 @@ legend{padding:0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.16em
       var b = final ? $('pdfBtn') : $('saveBtn'), lbl = b.textContent;
       b.disabled = true; b.innerHTML = '<span class="spin"></span>&nbsp; ' + (final ? 'GENERANDO PDF…' : 'GUARDANDO…');
       try { if (e.redacta) localStorage.setItem('tm_redacta', e.redacta); } catch (x) {}
-      call({ action: 'panel_guardar', id: e.id, cliente: e.cliente, dirigido: e.dirigido, redacta: e.redacta, evento: e.evento, fecha: e.fecha, lugar: e.lugar,
-        idea: e.idea, texto: e.texto, items: e.items, refs: e.refs, precio: e.precio, validez: e.validez, pago: e.pago, final: final }).then(function (d) {
+      var data = { action: 'panel_guardar', id: e.id, cliente: e.cliente, dirigido: e.dirigido, redacta: e.redacta, evento: e.evento, fecha: e.fecha, lugar: e.lugar,
+        idea: e.idea, texto: e.texto, items: e.items, refs: e.refs, precio: e.precio, validez: e.validez, pago: e.pago, final: false };
+      // PDF: se guarda el presupuesto, se arma el PDF aca (una pagina, fondo oscuro) y se sube al Drive.
+      // Si el armado falla (por ejemplo sin conexion a las librerias), lo arma Google como antes.
+      (final ? call(data).then(function (d0) {
+        e.id = d0.quote.id;
+        return makePdf(d0.quote).then(function (b64) { return call({ action: 'panel_pdf', id: d0.quote.id, pdf: b64 }); },
+          function (err) { console.warn('PDF local', err); data.id = d0.quote.id; data.final = true; return call(data); });
+      }) : call(data)).then(function (d) {
         ED = d.quote; SUMMARY = null;
         if (QUOTES) { var i = -1; QUOTES.forEach(function (q, k) { if (q.id === d.quote.id) i = k; }); if (i >= 0) QUOTES[i] = d.quote; else QUOTES.unshift(d.quote); }
         if (location.hash !== '#/p/' + d.quote.id) history.replaceState(null, '', '#/p/' + d.quote.id);
@@ -520,6 +527,94 @@ legend{padding:0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.16em
       '<span class="cond" style="display:flex;justify-content:space-between;gap:8px;border-top:1px solid rgba(var(--c-rgb),.2);padding-top:6px"><span>' +
         esc(SITE.NOMBRE_VISIBLE || 'Tapir Media') + (SITE.MAIL_CONTACTO ? '<br>' + esc(SITE.MAIL_CONTACTO) : '') + '</span><span style="text-align:right">' +
         (SITE.INSTAGRAM ? 'Instagram ' + esc(SITE.INSTAGRAM) : '') + '</span></span>';
+  }
+
+  // ---------- PDF (una sola pagina A4, fondo oscuro, armado en el navegador) ----------
+  var ISSUER = null, LIBS = null;
+  function loadScript(src) {
+    return new Promise(function (ok, ko) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = function () { ko(new Error('No cargó ' + src)); }; document.head.appendChild(s); });
+  }
+  function pdfLibs() {
+    if (!LIBS) LIBS = Promise.all([
+      window.html2canvas ? 0 : loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'),
+      window.jspdf ? 0 : loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
+    ]).catch(function (x) { LIBS = null; throw x; });
+    return LIBS;
+  }
+  function issuer() {
+    if (ISSUER) return Promise.resolve(ISSUER);
+    return call({ action: 'panel_emisor' }).then(function (d) { ISSUER = d; return d; });
+  }
+  function dmy(s) { var d = new Date(String(s).slice(0, 10) + 'T12:00:00'); return isNaN(d) ? '' : String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear(); }
+  function pdfHtml(q, I) {
+    var body = '', inList = false;
+    String(q.texto || '').split('\n').map(function (x) { return x.trim(); }).filter(Boolean).forEach(function (l) {
+      if (/^[-•*]\s+/.test(l)) { if (!inList) { body += '<ul>'; inList = true; } body += '<li><i></i><span>' + esc(l.replace(/^[-•*]\s+/, '')) + '</span></li>'; }
+      else { if (inList) { body += '</ul>'; inList = false; } body += /^incluye:?$/i.test(l) ? '<p class="qk">INCLUYE</p>' : '<p>' + esc(l) + '</p>'; }
+    });
+    if (inList) body += '</ul>';
+    var brand = String(SITE.MARCA || 'TAPIRMEDIA').toUpperCase(), k = brand.indexOf('MEDIA');
+    var row = function (a, b) { return b ? '<span class="qm">' + a + '</span><span>' + esc(b) + '</span>' : ''; };
+    var items = itemLines(q.items || {});
+    var refs = refList(q.refs);
+    return '<div class="qin">' +
+      '<span class="qcn qtl"></span><span class="qcn qbr"></span>' +
+      '<header><span class="qbrand">' + (k > 0 ? esc(brand.slice(0, k)) + '<em>' + esc(brand.slice(k)) + '</em>' : esc(brand)) + '</span>' +
+        '<span class="qm qr"><b>PRESUPUESTO N.º ' + pad(q.n) + '</b><br>EMITIDO ' + dmy(q.creado) + '<br>VÁLIDO HASTA ' + dmy(q.vence) + '</span></header>' +
+      '<span class="qline"></span>' +
+      '<h1>' + esc(q.evento || 'Presupuesto') + '</h1>' +
+      '<div class="qdt">' + row('CLIENTE', q.cliente) + row('DIRIGIDO A', q.dirigido) + row('FECHA', q.fecha) + row('LUGAR', q.lugar) + '</div>' +
+      '<section class="qbox"><p class="qk">// PROPUESTA</p>' + body +
+        (items.length ? '<p class="qk">// DETALLE</p><div class="qit">' + items.map(function (x) { return '<span class="qm">' + esc(x[0]).toUpperCase() + '</span><span>' + esc(x[1]) + '</span>'; }).join('') + '</div>' : '') +
+        (refs.length ? '<p class="qk">// REFERENCIAS</p><div class="qrf">' + refs.map(function (x) { return '<a data-u="' + esc(x[1]) + '">' + esc(x[0] || x[1].replace(/^https?:\/\//, '')) + (x[0] ? '<small>' + esc(x[1].replace(/^https?:\/\//, '')) + '</small>' : '') + '</a>'; }).join('') + '</div>' : '') +
+      '</section>' +
+      '<div class="qtot"><div><span class="qm">FORMA DE PAGO</span><span>' + esc(q.pago || 'A convenir') + '</span>' + (q.redacta ? '<span class="qm" style="margin-top:.9em">REDACTÓ</span><span>' + esc(q.redacta) + '</span>' : '') + '</div>' +
+        '<div class="qr"><span class="qm">TOTAL</span><b>' + money(q.precio) + '</b></div></div>' +
+      '<footer><span class="qm"><span class="qc">EMITE</span><br><b>' + esc(I.name) + '</b>' + I.lines.map(function (x) { return '<br>' + esc(x); }).join('') + '</span>' +
+        '<span class="qm qr"><span class="qc">REDES</span>' + I.socials.map(function (x) { return '<br>' + esc(x); }).join('') + '</span></footer>' +
+    '</div>';
+  }
+  var PDF_CSS = '#pdfpg{position:fixed;left:-12000px;top:0;width:794px;height:1123px;overflow:hidden;background:#1F1C19;color:#EEE9E4;font-family:Barlow,Arial,sans-serif;font-weight:300}' +
+    '#pdfpg .qin{position:relative;box-sizing:border-box;width:794px;min-height:1123px;padding:3.4em 3.8em 3em;display:flex;flex-direction:column;gap:1.25em}' +
+    '#pdfpg .qcn{position:absolute;width:26px;height:26px;border:0 solid #5CE6FF}#pdfpg .qcn.qtl{top:26px;left:26px;border-top-width:2px;border-left-width:2px}#pdfpg .qcn.qbr{bottom:26px;right:26px;border-bottom-width:2px;border-right-width:2px}' +
+    '#pdfpg header{display:flex;justify-content:space-between;align-items:flex-start;gap:2em}' +
+    '#pdfpg .qbrand{font-family:"Barlow Condensed",Arial,sans-serif;font-style:italic;font-weight:700;font-size:2.4em;line-height:1;letter-spacing:.02em}#pdfpg .qbrand em{font-style:inherit;color:#5CE6FF;text-shadow:0 0 14px rgba(92,230,255,.6)}' +
+    '#pdfpg .qm{font-family:"JetBrains Mono",monospace;font-size:.66em;letter-spacing:.14em;color:#B3AAA2;line-height:1.75}#pdfpg .qm b{color:#5CE6FF;font-weight:400}#pdfpg .qr{text-align:right}#pdfpg .qc{color:#5CE6FF}' +
+    '#pdfpg .qline{height:1px;background:#5CE6FF;box-shadow:0 0 8px rgba(92,230,255,.6)}' +
+    '#pdfpg h1{margin:0;font-family:"Barlow Condensed",Arial,sans-serif;font-style:italic;font-weight:700;font-size:3.3em;line-height:.95;text-transform:uppercase}' +
+    '#pdfpg .qdt{display:grid;grid-template-columns:8.5em 1fr;row-gap:.35em;align-items:baseline;font-size:.9em}#pdfpg .qdt .qm{font-size:.72em}' +
+    '#pdfpg .qbox{padding:1.3em 1.5em;border:1px solid rgba(92,230,255,.32);background:rgba(14,12,11,.45);display:flex;flex-direction:column;gap:.55em}' +
+    '#pdfpg .qbox p{margin:0;font-size:.9em;line-height:1.55;color:#D6CFC8}#pdfpg .qbox p.qk{font-family:"JetBrains Mono",monospace;font-size:.64em;letter-spacing:.16em;color:#5CE6FF;margin-top:.5em}#pdfpg .qbox p.qk:first-child{margin-top:0}' +
+    '#pdfpg ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:.35em}#pdfpg li{display:flex;gap:.8em;font-size:.88em;line-height:1.45}#pdfpg li i{flex:none;width:.9em;height:2px;margin-top:.7em;background:#5CE6FF}' +
+    '#pdfpg .qit{display:grid;grid-template-columns:13em 1fr;font-size:.84em}#pdfpg .qit>*{padding:.4em 0;border-bottom:1px solid rgba(92,230,255,.14)}#pdfpg .qit .qm{font-size:.76em;line-height:1.9}' +
+    '#pdfpg .qrf{display:flex;flex-direction:column;gap:.45em}#pdfpg .qrf a{color:#5CE6FF;font-size:.84em;line-height:1.35}#pdfpg .qrf small{display:block;font-family:"JetBrains Mono",monospace;font-size:.78em;color:#B3AAA2}' +
+    '#pdfpg .qtot{display:flex;justify-content:space-between;align-items:flex-end;gap:2em;padding:1.1em 0;border-top:1px solid rgba(92,230,255,.4);border-bottom:1px solid rgba(92,230,255,.4)}#pdfpg .qtot>div{display:flex;flex-direction:column;font-size:.88em}' +
+    '#pdfpg .qtot b{font-family:"Barlow Condensed",Arial,sans-serif;font-weight:500;font-size:3.6em;line-height:.95;color:#5CE6FF;text-shadow:0 0 18px rgba(92,230,255,.45)}' +
+    '#pdfpg footer{margin-top:auto;display:flex;justify-content:space-between;gap:2em;padding-top:.4em}#pdfpg footer .qm{font-size:.62em}#pdfpg footer .qm b{color:#EEE9E4}';
+  function makePdf(q) {
+    return Promise.all([pdfLibs(), issuer(), document.fonts ? document.fonts.ready : 0]).then(function (r) {
+      var I = r[1];
+      if (!$('pdfcss')) { var st = document.createElement('style'); st.id = 'pdfcss'; st.textContent = PDF_CSS; document.head.appendChild(st); }
+      var pg = document.createElement('div'); pg.id = 'pdfpg'; pg.innerHTML = pdfHtml(q, I); document.body.appendChild(pg);
+      var inn = pg.firstChild;
+      // Achica la letra hasta que entre todo en una pagina.
+      var size = 16;
+      inn.style.minHeight = '0';
+      while (size > 9 && inn.offsetHeight > 1123) { size -= .5; pg.style.fontSize = size + 'px'; }
+      if (inn.offsetHeight > 1123) { var sc = 1123 / inn.offsetHeight; inn.style.transformOrigin = '0 0'; inn.style.transform = 'scale(' + sc + ')'; inn.style.width = (794 / sc) + 'px'; }
+      else inn.style.minHeight = '1123px';
+      var box = pg.getBoundingClientRect();
+      var links = [].slice.call(pg.querySelectorAll('[data-u]')).map(function (a) { var b = a.getBoundingClientRect(); return { u: a.getAttribute('data-u'), x: b.left - box.left, y: b.top - box.top, w: b.width, h: b.height }; });
+      return window.html2canvas(pg, { scale: 2, backgroundColor: '#1F1C19', logging: false, width: 794, height: 1123, x: 0, y: 0, scrollX: 0, scrollY: 0, windowWidth: 1400, windowHeight: 1200,
+        onclone: function (d) { var c = d.getElementById('pdfpg'); c.style.left = '0px'; c.style.top = '0px'; } }).then(function (cv) {
+        pg.remove();
+        var J = window.jspdf.jsPDF, doc = new J({ unit: 'pt', format: 'a4', compress: true }), k = 595.28 / 794;
+        doc.setProperties({ title: 'Presupuesto ' + pad(q.n) + ' · ' + (q.evento || q.cliente || ''), author: SITE.NOMBRE_VISIBLE || 'Tapir Media' });
+        doc.addImage(cv.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, 595.28, 841.89);
+        links.forEach(function (l) { doc.link(l.x * k, l.y * k, l.w * k, l.h * k, { url: l.u }); });
+        return doc.output('datauristring').split(',')[1];
+      }, function (x) { pg.remove(); throw x; });
+    });
   }
 
   // ---------- rutas ----------
