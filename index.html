@@ -122,10 +122,12 @@ a.btn,a.btn:hover{color:var(--on-c)}
 
 /* Tapirteam */
 .bio .wrap{padding-top:56px;padding-bottom:104px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;row-gap:48px}
-.bio .txt{grid-column:1 / span 4;display:flex;flex-direction:column;gap:20px}
+.bio .txt{grid-column:1 / span 5;display:flex;flex-direction:column;gap:20px}
 .bio .txt h2{margin:0;font-size:64px;line-height:.9}
-.bio .txt p.lead{margin:0;max-width:360px;font-size:17px;line-height:1.6;color:var(--muted);white-space:pre-line}
-.team{grid-column:6 / span 7;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.bio .txt .lead{display:flex;flex-direction:column;gap:14px;max-width:520px}
+.bio .txt .lead p{margin:0;font-size:16px;line-height:1.65;color:var(--muted)}
+.bio .txt .lead p:first-child{font-family:var(--cond);font-weight:500;font-size:26px;line-height:1.15;letter-spacing:.03em;color:var(--text)}
+.team{grid-column:7 / span 6;align-self:start;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
 .member{display:flex;flex-direction:column;gap:14px}
 .member .fr{position:relative}
 .member .pic{aspect-ratio:4/5;overflow:hidden;clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,0 100%)}
@@ -461,7 +463,8 @@ a.btn,a.btn:hover{color:var(--on-c)}
       ((SITE.BIO_TEXTO || team) ? '<div class="wrap"><div class="sep"><span>// ' + esc(String(SITE.BIO_TITULO || 'NOSOTROS').toUpperCase()) + '</span><i></i><em></em></div></div>' +
         '<section class="bio" id="nosotros" aria-label="Nosotros"><div class="wrap">' +
         '<div class="txt"><h2 class="it">' + neonTitle(SITE.BIO_TITULO || SITE.MARCA || '') + '</h2>' +
-        (SITE.BIO_TEXTO ? '<p class="lead">' + esc(SITE.BIO_TEXTO) + '</p>' : '') + '</div>' +
+        (SITE.BIO_TEXTO ? '<div class="lead">' + String(SITE.BIO_TEXTO).split(/\n+/).map(function (x) { return x.trim(); }).filter(Boolean)
+          .map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') + '</div>' : '') + '</div>' +
         (team ? '<div class="team">' + team + '</div>' : '') + '</div></section>' : '') +
       (facts.length ? '<section class="facts" aria-label="Curiosidades" aria-live="polite"><div class="wrap"><div class="fpanel"><span class="k1"></span><span class="k2"></span>' +
         '<div class="fh"><b>' + esc(SITE.CURIOSIDADES_TITULO || '¿Sabías que…?') + '</b><span id="fNum"></span></div>' +
