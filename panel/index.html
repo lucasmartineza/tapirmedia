@@ -48,9 +48,11 @@ button,input,textarea,select{font-family:inherit;color:inherit}
 /* Header */
 .top{border-bottom:1px solid var(--line);background:rgba(31,28,25,.92);position:sticky;top:0;z-index:20;backdrop-filter:blur(8px)}
 .top .wrap{height:84px;display:flex;align-items:center;justify-content:space-between;gap:24px}
-.brand{display:flex;align-items:baseline;gap:16px;color:var(--text)}
+.brand{display:flex;align-items:center;gap:16px;color:var(--text)}
 .brand:hover{color:var(--text)}
 .brand .nm{font-family:var(--cond);font-style:italic;font-weight:700;font-size:28px}
+.brand .nm img.lg{display:block;height:36px;width:auto;max-width:240px}
+.paper .br img{display:block;height:20px;width:auto}
 .brand .nm em{font-style:inherit;color:var(--c);text-shadow:0 0 14px rgba(var(--c-rgb),.7)}
 .brand .tag{padding:3px 8px;border:1px solid var(--c);font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--c)}
 .tright{display:flex;align-items:center;gap:22px}
@@ -170,6 +172,7 @@ legend{padding:0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.16em
 @media (max-width:700px){
   .wrap{padding:0 20px}
   .tabs{display:none}
+  .brand .nm img.lg{height:28px}
   .tright{gap:8px}.home{padding:0 10px}
   .brand .tag{display:none}
   #newBtn{padding:0 16px;font-size:20px;letter-spacing:0}#newBtn .nb{display:none}
@@ -237,7 +240,11 @@ legend{padding:0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.16em
   function logout() { TOKEN = ''; try { localStorage.removeItem('tm_panel'); } catch (e) {} QUOTES = SUMMARY = null; location.hash = '#/'; route(); }
 
   // Datos de la marca para la vista previa (los mismos de la web)
-  fetch(API + '?action=site').then(function (r) { return r.json(); }).then(function (d) { SITE = (d && d.site) || {}; }).catch(function () {});
+  fetch(API + '?action=site').then(function (r) { return r.json(); }).then(function (d) {
+    SITE = (d && d.site) || {};
+    if (SITE.LOGO_URL) document.querySelector('.brand .nm').innerHTML = '<img class="lg" src="' + esc(SITE.LOGO_URL) + '" alt="' + esc(SITE.MARCA || 'Logo') + '">';
+    paper();
+  }).catch(function () {});
 
   // ---------- login ----------
   function renderLogin(msg) {
@@ -510,7 +517,7 @@ legend{padding:0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.16em
     });
     if (inList) html += '</ul>';
     var brand = String(SITE.MARCA || 'TAPIRMEDIA').toUpperCase(), k = brand.indexOf('MEDIA');
-    p.innerHTML = '<div class="t1"><span class="br">' + (k > 0 ? esc(brand.slice(0, k)) + '<em>' + esc(brand.slice(k)) + '</em>' : esc(brand)) + '</span>' +
+    p.innerHTML = '<div class="t1"><span class="br">' + (SITE.LOGO_URL ? '<img src="' + esc(SITE.LOGO_URL) + '" alt="">' : k > 0 ? esc(brand.slice(0, k)) + '<em>' + esc(brand.slice(k)) + '</em>' : esc(brand)) + '</span>' +
       '<span class="meta">PRESUPUESTO N.º ' + (e.n ? pad(e.n) : '----') + '<br>EMITIDO ' + f(created) + '<br>VÁLIDO HASTA ' + f(until) + '</span></div>' +
       '<span style="height:1px;background:rgba(var(--c-rgb),.4)"></span>' +
       '<span class="ttl">' + esc(e.evento || 'Presupuesto') + '</span>' +
@@ -559,7 +566,7 @@ legend{padding:0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.16em
     var refs = refList(q.refs);
     return '<div class="qin">' +
       '<span class="qcn qtl"></span><span class="qcn qbr"></span>' +
-      '<header><span class="qbrand">' + (k > 0 ? esc(brand.slice(0, k)) + '<em>' + esc(brand.slice(k)) + '</em>' : esc(brand)) + '</span>' +
+      '<header><span class="qbrand">' + (I.logo ? '<img src="' + I.logo + '" alt="">' : k > 0 ? esc(brand.slice(0, k)) + '<em>' + esc(brand.slice(k)) + '</em>' : esc(brand)) + '</span>' +
         '<span class="qm qr"><b>PRESUPUESTO N.º ' + pad(q.n) + '</b><br>EMITIDO ' + dmy(q.creado) + '<br>VÁLIDO HASTA ' + dmy(q.vence) + '</span></header>' +
       '<span class="qline"></span>' +
       '<h1>' + esc(q.evento || 'Presupuesto') + '</h1>' +
@@ -578,7 +585,7 @@ legend{padding:0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.16em
     '#pdfpg .qin{position:relative;box-sizing:border-box;width:794px;min-height:1123px;padding:3.4em 3.8em 3em;display:flex;flex-direction:column;gap:1.25em}' +
     '#pdfpg .qcn{position:absolute;width:26px;height:26px;border:0 solid #5CE6FF}#pdfpg .qcn.qtl{top:26px;left:26px;border-top-width:2px;border-left-width:2px}#pdfpg .qcn.qbr{bottom:26px;right:26px;border-bottom-width:2px;border-right-width:2px}' +
     '#pdfpg header{display:flex;justify-content:space-between;align-items:flex-start;gap:2em}' +
-    '#pdfpg .qbrand{font-family:"Barlow Condensed",Arial,sans-serif;font-style:italic;font-weight:700;font-size:2.4em;line-height:1;letter-spacing:.02em}#pdfpg .qbrand em{font-style:inherit;color:#5CE6FF;text-shadow:0 0 14px rgba(92,230,255,.6)}' +
+    '#pdfpg .qbrand{font-family:"Barlow Condensed",Arial,sans-serif;font-style:italic;font-weight:700;font-size:2.4em;line-height:1;letter-spacing:.02em}#pdfpg .qbrand img{display:block;height:3em;width:auto;max-width:22em}#pdfpg .qbrand em{font-style:inherit;color:#5CE6FF;text-shadow:0 0 14px rgba(92,230,255,.6)}' +
     '#pdfpg .qm{font-family:"JetBrains Mono",monospace;font-size:.66em;letter-spacing:.14em;color:#B3AAA2;line-height:1.75}#pdfpg .qm b{color:#5CE6FF;font-weight:400}#pdfpg .qr{text-align:right}#pdfpg .qc{color:#5CE6FF}' +
     '#pdfpg .qline{height:1px;background:#5CE6FF;box-shadow:0 0 8px rgba(92,230,255,.6)}' +
     '#pdfpg h1{margin:0;font-family:"Barlow Condensed",Arial,sans-serif;font-style:italic;font-weight:700;font-size:3.3em;line-height:.95;text-transform:uppercase}' +
