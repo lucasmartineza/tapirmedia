@@ -1000,8 +1000,18 @@ a.btn.ghost,a.btn.ghost:hover{color:#fff}
     if (!f) return;
     e.preventDefault();
     var q = String(f.q.value || '').replace(/\D/g, '');
-    if (!q) { f.q.focus(); return; }
+    if (!q) { showAllAgain(f); return; }
     location.hash = '#/b/' + f.dataset.event + '/' + q;
+  });
+  // Al borrar el número, vuelven a verse todas las fotos del evento (y el cursor queda listo para otra búsqueda)
+  function showAllAgain(f) {
+    if (!/^#\/b\//.test(location.hash)) { f.q.focus(); return; }
+    location.hash = '#/f/' + f.dataset.event;
+    setTimeout(function () { var i = document.getElementById('nq'); if (i) i.focus(); }, 60);
+  }
+  document.addEventListener('input', function (e) {
+    var f = e.target.closest && e.target.closest('form.nsearch');
+    if (f && !String(f.q.value || '').replace(/\D/g, '')) showAllAgain(f);
   });
   (function () {
     var v = new URLSearchParams(location.search).get('buscador');
